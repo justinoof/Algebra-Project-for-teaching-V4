@@ -2,229 +2,2072 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Balance Quest — Learn Algebra</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <style>
 :root {
-    --purple: #8b5cf6;
-    --purple-dark: #6d28d9;
-    --green: #10b981;
-    --red: #ef4444;
-    --dark: #0f172a;
-    --muted: #64748b;
-    --bg-gradient: linear-gradient(135deg, #eef2ff 0%, #f1f5f9 100%);
-    --card-bg: #ffffff;
+--purple: #8b5cf6;
+--pink: #ec4899;
+--blue: #3b82f6;
+--green: #22c55e;
+--red: #ef4444;
+--orange: #f59e0b;
+--dark: #1e293b;
+--muted: #64748b;
 }
 
-* { box-sizing: border-box; touch-action: none; }
-body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg-gradient); color: var(--dark); text-align: center; min-height: 100vh; user-select: none; }
-h1, h2, h3, .equation-display { font-family: 'Outfit', sans-serif; }
-header { background: linear-gradient(135deg, #7c3aed, #2563eb); color: white; padding: 20px; }
-header h1 { margin: 0; font-size: 2rem; }
+* {
+box-sizing: border-box;
+}
 
-.game { max-width: 900px; margin: 20px auto; padding: 0 15px 40px; }
-.card { background: var(--card-bg); border-radius: 24px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
-.equation-display { font-size: 2.2rem; margin: 15px 0; font-weight: 700; color: var(--purple-dark); }
+body {
+margin: 0;
+font-family: Arial, sans-serif;
+background: linear-gradient(135deg, #eef2ff, #f8fafc);
+color: var(--dark);
+text-align: center;
+}
 
-.balance-row { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin: 20px 0; }
-.scale-card { flex: 1; min-width: 280px; background: #f8fafc; border-radius: 20px; padding: 15px; border: 2px solid #e2e8f0; }
-.scale { position: relative; height: 220px; margin-top: 10px; }
+header {
+background: linear-gradient(90deg, #7c3aed, #2563eb);
+color: white;
+padding: 20px;
+}
 
-.beam { position: absolute; top: 150px; left: 10%; width: 80%; height: 10px; background: #475569; border-radius: 10px; }
-.pivot { position: absolute; top: 160px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 30px solid transparent; border-right: 30px solid transparent; border-bottom: 50px solid #64748b; }
+header h1 {
+margin: 0;
+}
 
-.pan { position: absolute; top: 20px; width: 42%; min-height: 100px; padding: 8px; display: flex; align-items: flex-end; justify-content: center; flex-wrap: wrap; gap: 6px; border-bottom: 5px solid #94a3b8; border-radius: 0 0 12px 12px; }
-.pan.left { left: 4%; } .pan.right { right: 4%; }
+header p {
+margin: 6px 0 0;
+}
 
-.block { width: 46px; height: 46px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; font-weight: 700; font-family: 'Outfit', sans-serif; box-shadow: 0 4px 8px rgba(0,0,0,0.15); cursor: grab; }
-.x-block { background: linear-gradient(135deg, #a855f7, #7c3aed); }
-.y-block { background: linear-gradient(135deg, #f472b6, #db2777); }
-.weight-block { background: linear-gradient(135deg, #60a5fa, #2563eb); width: 38px; height: 38px; font-size: 15px; }
+.game {
+max-width: 1100px;
+margin: auto;
+padding: 25px;
+}
 
-.bin { margin: 20px auto; width: 280px; min-height: 90px; border: 2px dashed #cbd5e1; border-radius: 16px; padding: 10px; background: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.bin.active { background: #fef2f2; border-color: var(--red); }
-.inventory { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+.card {
+background: white;
+border-radius: 22px;
+padding: 25px;
+box-shadow: 0 10px 30px rgba(0,0,0,.08);
+}
 
-button { border: none; border-radius: 12px; padding: 12px 24px; margin: 5px; background: var(--purple); color: white; font-size: 1rem; font-weight: 600; cursor: pointer; }
-button.green { background: var(--green); }
-button.secondary { background: var(--muted); }
-.hidden { display: none !important; }
-.message { min-height: 35px; margin-top: 15px; font-size: 1.1rem; font-weight: 600; }
-.success { color: #059669; } .warning { color: #dc2626; }
+#levelTitle {
+margin-top: 0;
+}
+
+#instruction {
+font-size: 1.2rem;
+min-height: 60px;
+line-height: 1.5;
+}
+
+.equation-display {
+font-size: 1.7rem;
+margin: 15px;
+font-weight: bold;
+min-height: 40px;
+}
+
+.operation-box {
+background: #f5f3ff;
+border: 2px solid #c4b5fd;
+border-radius: 16px;
+padding: 18px;
+margin: 15px auto;
+max-width: 700px;
+}
+
+.operation-title {
+font-size: 1.15rem;
+font-weight: bold;
+margin-bottom: 8px;
+}
+
+.operation-equation {
+font-size: 1.4rem;
+margin: 10px;
+}
+
+.balance-row {
+display: flex;
+justify-content: center;
+gap: 25px;
+flex-wrap: wrap;
+}
+
+.scale-card {
+flex: 1;
+min-width: 330px;
+background: #f8fafc;
+border-radius: 20px;
+padding: 15px;
+border: 3px solid transparent;
+transition: .4s;
+}
+
+.scale-card.highlight {
+border-color: var(--purple);
+box-shadow: 0 0 20px rgba(139,92,246,.3);
+}
+
+.scale {
+position: relative;
+height: 260px;
+margin-top: 10px;
+}
+
+.beam {
+position: absolute;
+top: 165px;
+left: 10%;
+width: 80%;
+height: 14px;
+background: #475569;
+border-radius: 10px;
+transform-origin: center;
+transition: transform .5s ease;
+}
+
+.pivot {
+position: absolute;
+top: 178px;
+left: 50%;
+transform: translateX(-50%);
+width: 0;
+height: 0;
+border-left: 48px solid transparent;
+border-right: 48px solid transparent;
+border-bottom: 75px solid #64748b;
+}
+
+.pan {
+position: absolute;
+top: 30px;
+width: 42%;
+min-height: 110px;
+padding: 10px;
+display: flex;
+align-items: flex-end;
+justify-content: center;
+flex-wrap: wrap;
+gap: 8px;
+border-bottom: 6px solid #94a3b8;
+}
+
+.pan.left {
+left: 4%;
+}
+
+.pan.right {
+right: 4%;
+}
+
+.block {
+width: 58px;
+height: 58px;
+border-radius: 12px;
+display: flex;
+align-items: center;
+justify-content: center;
+color: white;
+font-size: 23px;
+font-weight: bold;
+cursor: grab;
+box-shadow: 0 5px 10px rgba(0,0,0,.18);
+user-select: none;
+transition: .2s;
+}
+
+.block:hover {
+transform: translateY(-4px) scale(1.05);
+}
+
+.block.dragging {
+opacity: .4;
+}
+
+.x-block {
+background: var(--purple);
+}
+
+.y-block {
+background: var(--pink);
+}
+
+.weight-block {
+background: var(--blue);
+}
+
+.block.small {
+width: 42px;
+height: 42px;
+font-size: 18px;
+}
+
+.bin {
+margin: 20px auto;
+width: 280px;
+min-height: 95px;
+border: 3px dashed #94a3b8;
+border-radius: 18px;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+background: #f8fafc;
+transition: .2s;
+}
+
+.bin.over {
+background: #fee2e2;
+border-color: var(--red);
+transform: scale(1.03);
+}
+
+.inventory {
+display: flex;
+justify-content: center;
+flex-wrap: wrap;
+gap: 5px;
+min-height: 35px;
+margin: 5px;
+}
+
+.controls {
+margin-top: 20px;
+}
+
+button {
+border: none;
+border-radius: 12px;
+padding: 13px 22px;
+margin: 5px;
+background: var(--purple);
+color: white;
+font-size: 16px;
+cursor: pointer;
+transition: .2s;
+}
+
+button:hover {
+transform: translateY(-2px);
+filter: brightness(1.05);
+}
+
+button.green {
+background: var(--green);
+}
+
+button.secondary {
+background: var(--muted);
+}
+
+button.orange {
+background: var(--orange);
+}
+
+.hidden {
+display: none !important;
+}
+
+.message {
+min-height: 50px;
+margin-top: 18px;
+font-size: 1.15rem;
+font-weight: bold;
+line-height: 1.5;
+}
+
+.success {
+color: #16a34a;
+}
+
+.warning {
+color: #dc2626;
+}
+
+.info {
+color: #2563eb;
+}
+
+.substitution-animation {
+font-size: 1.25rem;
+padding: 15px;
+border-radius: 16px;
+background: #fdf2f8;
+margin: 15px auto;
+max-width: 750px;
+}
+
+@media(max-width: 700px) {
+.scale-card {
+min-width: 100%;
+}
+
+.block {
+width: 48px;
+height: 48px;
+}
+}
 </style>
 </head>
+
 <body>
 
 <header>
-    <h1>⚖️ Balance Quest</h1>
+<h1>⚖️ Balance Quest</h1>
+<p>Learn algebra by keeping the equation balanced!</p>
 </header>
 
 <div class="game">
 <div class="card">
-    <h2 id="levelTitle">Level 1</h2>
-    <div id="instruction">Drag or Tap weight blocks into the bin!</div>
-    <div id="equationDisplay" class="equation-display">3x + 1 = 10</div>
 
-    <div id="balanceRow" class="balance-row"></div>
+<h2 id="levelTitle">Tutorial</h2>
 
-    <div id="bin" class="bin">
-        <strong>🗑️ Drop or Tap Blocks Here</strong>
-        <div id="inventory" class="inventory"></div>
-    </div>
+<div id="instruction"></div>
 
-    <div class="controls">
-        <button id="checkBtn" class="green hidden" onclick="checkSolve()">Check Solution</button>
-        <button id="resetBtn" class="secondary" onclick="loadLevel()">Reset Level</button>
-    </div>
+<div id="equationDisplay" class="equation-display"></div>
 
-    <div id="message" class="message"></div>
+<div id="operationBox" class="operation-box hidden">
+<div id="operationTitle" class="operation-title"></div>
+<div id="operationEquation" class="operation-equation"></div>
+<div id="operationExplanation"></div>
+</div>
+
+<div id="substitutionBox"
+class="substitution-animation hidden"></div>
+
+<div id="balanceRow" class="balance-row"></div>
+
+<div id="bin" class="bin hidden">
+<strong>🗑️ Removed Blocks</strong>
+<div id="inventory" class="inventory"></div>
+<small>Drag blocks here</small>
+</div>
+
+<div class="controls">
+
+<button id="nextStep" onclick="nextStep()">
+Next →
+</button>
+
+<button id="operationButton"
+class="green hidden"
+onclick="performOperation()">
+Do This Operation →
+</button>
+
+<button id="checkButton"
+class="green hidden"
+onclick="checkProgress()">
+Check
+</button>
+
+<button id="restartButton"
+class="secondary hidden"
+onclick="restartLevel()">
+Restart Level
+</button>
+
+</div>
+
+<div id="message" class="message"></div>
+
 </div>
 </div>
 
 <script>
-let level = 1;
-let leftBlocks = [{type:'x'}, {type:'x'}, {type:'x'}, {type:'w', val:1}];
-let rightBlocks = Array.from({length: 10}, () => ({type:'w', val:1}));
-let binBlocks = [];
+
+/* =========================================================
+GAME STATE
+========================================================= */
+
+let level = 0;
+let step = 0;
+
+let scales = [];
+let removedBlocks = [];
+
+let tutorialRemovedLeft = 0;
+let tutorialRemovedRight = 0;
+
+let level2RemovedLeft = 0;
+let level2RemovedRight = 0;
+
+let level3RemovedLeft = 0;
+let level3RemovedRight = 0;
+
+let dragData = null;
+
+
+/* =========================================================
+BASIC HELPERS
+========================================================= */
+
+function weights(number) {
+return Array.from({length: number}, () => ({
+type: "weight",
+value: 1
+}));
+}
+
+function getScale(id) {
+return scales.find(scale => scale.id === id);
+}
+
+function resetRemoved() {
+removedBlocks = [];
+}
+
+function resetUI() {
+
+document.getElementById("message").innerHTML = "";
+
+document.getElementById("operationBox")
+.classList.add("hidden");
+
+document.getElementById("operationButton")
+.classList.add("hidden");
+
+document.getElementById("checkButton")
+.classList.add("hidden");
+
+document.getElementById("substitutionBox")
+.classList.add("hidden");
+
+document.getElementById("bin")
+.classList.add("hidden");
+
+const next =
+document.getElementById("nextStep");
+
+next.classList.remove("hidden");
+next.innerText = "Next →";
+next.onclick = nextStep;
+}
+
+
+/* =========================================================
+LEVEL SETUP
+========================================================= */
+
+function setupTutorial() {
+
+resetRemoved();
+
+tutorialRemovedLeft = 0;
+tutorialRemovedRight = 0;
+
+scales = [{
+id: "main",
+
+left: [
+{type:"x"},
+{type:"x"},
+...weights(2)
+],
+
+right: weights(8)
+}];
+}
+
+
+function setupLevel1() {
+
+resetRemoved();
+
+scales = [{
+id: "main",
+
+left: [
+{type:"x"},
+{type:"x"}
+],
+
+right: weights(6)
+}];
+}
+
+
+function setupLevel2() {
+
+resetRemoved();
+
+level2RemovedLeft = 0;
+level2RemovedRight = 0;
+
+scales = [{
+id: "main",
+
+left: [
+{type:"x"},
+{type:"x"},
+{type:"x"},
+{type:"weight", value:1}
+],
+
+right: weights(10)
+}];
+}
+
+
+function setupLevel3() {
+
+resetRemoved();
+
+level3RemovedLeft = 0;
+level3RemovedRight = 0;
+
+scales = [
+{
+id: "xy",
+title: "Scale A",
+
+left: [
+{type:"x"},
+{type:"y"}
+],
+
+right: weights(7)
+},
+
+{
+id: "y",
+title: "Scale B",
+
+left: [
+{type:"y"}
+],
+
+right: weights(3)
+}
+];
+}
+
+
+/* =========================================================
+RENDER SCALE
+========================================================= */
 
 function render() {
-    const row = document.getElementById("balanceRow");
-    row.innerHTML = `
-        <div class="scale-card">
-            <div class="scale">
-                <div class="pan left" id="pan-left"></div>
-                <div class="pan right" id="pan-right"></div>
-                <div class="beam"></div>
-                <div class="pivot"></div>
-            </div>
-        </div>
-    `;
 
-    const leftPan = document.getElementById("pan-left");
-    const rightPan = document.getElementById("pan-right");
+const row =
+document.getElementById("balanceRow");
 
-    leftBlocks.forEach((b, i) => leftPan.appendChild(createBlockElem(b, 'left', i)));
-    rightBlocks.forEach((b, i) => rightPan.appendChild(createBlockElem(b, 'right', i)));
+row.innerHTML = "";
 
-    const inv = document.getElementById("inventory");
-    inv.innerHTML = "";
-    binBlocks.forEach(b => {
-        const el = document.createElement("div");
-        el.className = "block weight-block";
-        el.innerText = "1";
-        inv.appendChild(el);
-    });
+scales.forEach(scale => {
 
-    checkState();
+const card =
+document.createElement("div");
+
+card.className = "scale-card";
+card.id = "card-" + scale.id;
+
+if (scale.title) {
+
+const title =
+document.createElement("h3");
+
+title.innerText = scale.title;
+
+card.appendChild(title);
 }
 
-function createBlockElem(block, side, index) {
-    const el = document.createElement("div");
-    el.className = `block ${block.type === 'x' ? 'x-block' : 'weight-block'}`;
-    el.innerText = block.type === 'x' ? 'x' : '1';
+const visual =
+document.createElement("div");
 
-    if (block.type === 'w') {
-        attachCustomPointerDrag(el, side, index);
-    }
-    return el;
+visual.className = "scale";
+
+const left =
+document.createElement("div");
+
+left.className = "pan left";
+
+const right =
+document.createElement("div");
+
+right.className = "pan right";
+
+
+scale.left.forEach((block, index) => {
+
+left.appendChild(
+createBlock(
+block,
+scale.id,
+"left",
+index
+)
+);
+});
+
+
+scale.right.forEach((block, index) => {
+
+right.appendChild(
+createBlock(
+block,
+scale.id,
+"right",
+index
+)
+);
+});
+
+
+const beam =
+document.createElement("div");
+
+beam.className = "beam";
+
+
+const pivot =
+document.createElement("div");
+
+pivot.className = "pivot";
+
+
+visual.appendChild(left);
+visual.appendChild(right);
+visual.appendChild(beam);
+visual.appendChild(pivot);
+
+card.appendChild(visual);
+
+row.appendChild(card);
+
+updateTilt(scale);
+});
+
+renderInventory();
 }
 
-function attachCustomPointerDrag(el, side, index) {
-    el.addEventListener("pointerdown", (e) => {
-        e.preventDefault();
-        
-        // Tap/click fallback
-        let moved = false;
-        const startX = e.clientX;
-        const startY = e.clientY;
 
-        const clone = el.cloneNode(true);
-        clone.style.position = "fixed";
-        clone.style.zIndex = "1000";
-        clone.style.pointerEvents = "none";
-        clone.style.left = `${e.clientX - 20}px`;
-        clone.style.top = `${e.clientY - 20}px`;
-        document.body.appendChild(clone);
-        el.style.opacity = "0.3";
+/* =========================================================
+BLOCK CREATION
+========================================================= */
 
-        function onPointerMove(ev) {
-            if (Math.abs(ev.clientX - startX) > 5 || Math.abs(ev.clientY - startY) > 5) {
-                moved = true;
-            }
-            clone.style.left = `${ev.clientX - 20}px`;
-            clone.style.top = `${ev.clientY - 20}px`;
+function createBlock(block, scaleID, side, index) {
 
-            const bin = document.getElementById("bin").getBoundingClientRect();
-            if (ev.clientX >= bin.left && ev.clientX <= bin.right && ev.clientY >= bin.top && ev.clientY <= bin.bottom) {
-                document.getElementById("bin").classList.add("active");
-            } else {
-                document.getElementById("bin").classList.remove("active");
-            }
-        }
+const element =
+document.createElement("div");
 
-        function onPointerUp(ev) {
-            window.removeEventListener("pointermove", onPointerMove);
-            window.removeEventListener("pointerup", onPointerUp);
-            document.body.removeChild(clone);
-            el.style.opacity = "1";
-            document.getElementById("bin").classList.remove("active");
+element.className = "block";
 
-            const bin = document.getElementById("bin").getBoundingClientRect();
-            const droppedInBin = (ev.clientX >= bin.left && ev.clientX <= bin.right && ev.clientY >= bin.top && ev.clientY <= bin.bottom);
 
-            // If tapped OR dragged into bin, execute removal
-            if (!moved || droppedInBin) {
-                removeWeight(side, index);
-            }
-        }
+if (block.type === "x") {
 
-        window.addEventListener("pointermove", onPointerMove);
-        window.addEventListener("pointerup", onPointerUp);
-    });
+element.classList.add("x-block");
+element.innerText = "x";
 }
 
-function removeWeight(side, index) {
-    if (side === 'left') {
-        binBlocks.push(leftBlocks.splice(index, 1)[0]);
-    } else {
-        binBlocks.push(rightBlocks.splice(index, 1)[0]);
-    }
-    render();
+else if (block.type === "y") {
+
+element.classList.add("y-block");
+element.innerText = "y";
 }
 
-function checkState() {
-    const leftW = leftBlocks.filter(b => b.type === 'w').length;
-    const rightW = rightBlocks.filter(b => b.type === 'w').length;
+else {
 
-    if (leftW === 0 && rightW === 9) {
-        document.getElementById("equationDisplay").innerText = "3x = 9";
-        document.getElementById("instruction").innerText = "Great! Both sides reduced cleanly. Click Check!";
-        document.getElementById("checkBtn").classList.remove("hidden");
-    } else {
-        document.getElementById("equationDisplay").innerText = `3x ${leftW ? '+ ' + leftW : ''} = ${rightW}`;
-        document.getElementById("checkBtn").classList.add("hidden");
-    }
+element.classList.add(
+"weight-block",
+"small"
+);
+
+element.innerText = block.value;
 }
 
-function checkSolve() {
-    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-    document.getElementById("message").innerHTML = "<span class='success'>🎉 Correct! 3x = 9 → x = 3</span>";
+
+if (canDrag(block)) {
+
+element.draggable = true;
+
+element.addEventListener(
+"dragstart",
+() => {
+
+dragData = {
+scaleID,
+side,
+index,
+block
+};
+
+element.classList.add("dragging");
 }
+);
+
+element.addEventListener(
+"dragend",
+() => {
+
+element.classList.remove("dragging");
+}
+);
+}
+
+return element;
+}
+
+
+/* =========================================================
+DRAG RULE
+========================================================= */
+
+function canDrag(block) {
+
+if (block.type !== "weight") {
+return false;
+}
+
+if (level === 0) {
+
+return (
+step === 3 ||
+step === 5 ||
+step === 7
+);
+}
+
+if (level === 2) {
+
+return true;
+}
+
+if (level === 3) {
+
+return true;
+}
+
+return false;
+}
+
+
+/* =========================================================
+INVENTORY
+========================================================= */
+
+function renderInventory() {
+
+const inventory =
+document.getElementById("inventory");
+
+inventory.innerHTML = "";
+
+removedBlocks.forEach(item => {
+
+const block =
+document.createElement("div");
+
+block.className =
+"block weight-block small";
+
+block.innerText =
+item.block.value;
+
+inventory.appendChild(block);
+});
+}
+
+
+/* =========================================================
+TILT
+========================================================= */
+
+function updateTilt(scale) {
+
+const beam =
+document.querySelector(
+"#card-" + scale.id + " .beam"
+);
+
+if (!beam) return;
+
+
+if (level === 0) {
+
+if (
+tutorialRemovedLeft >
+tutorialRemovedRight
+) {
+
+beam.style.transform =
+"rotate(-7deg)";
+}
+
+else if (
+tutorialRemovedRight >
+tutorialRemovedLeft
+) {
+
+beam.style.transform =
+"rotate(7deg)";
+}
+
+else {
+
+beam.style.transform =
+"rotate(0deg)";
+}
+
+return;
+}
+
+
+if (level === 2) {
+
+if (
+level2RemovedLeft >
+level2RemovedRight
+) {
+
+beam.style.transform =
+"rotate(-7deg)";
+}
+
+else if (
+level2RemovedRight >
+level2RemovedLeft
+) {
+
+beam.style.transform =
+"rotate(7deg)";
+}
+
+else {
+
+beam.style.transform =
+"rotate(0deg)";
+}
+
+return;
+}
+
+
+beam.style.transform =
+"rotate(0deg)";
+}
+
+
+/* =========================================================
+BIN
+========================================================= */
+
+const bin =
+document.getElementById("bin");
+
+bin.addEventListener(
+"dragover",
+event => {
+
+event.preventDefault();
+
+bin.classList.add("over");
+}
+);
+
+bin.addEventListener(
+"dragleave",
+() => {
+
+bin.classList.remove("over");
+}
+);
+
+bin.addEventListener(
+"drop",
+event => {
+
+event.preventDefault();
+
+bin.classList.remove("over");
+
+if (!dragData) return;
+
+removeBlock();
+}
+);
+
+
+/* =========================================================
+REMOVE BLOCK
+========================================================= */
+
+function removeBlock() {
+
+if (!dragData) return;
+
+const scale =
+getScale(dragData.scaleID);
+
+if (!scale) return;
+
+
+/*
+STORE THE BLOCK.
+It no longer disappears permanently.
+*/
+
+removedBlocks.push({
+level,
+scaleID: dragData.scaleID,
+side: dragData.side,
+block: {...dragData.block}
+});
+
+
+scale[dragData.side].splice(
+dragData.index,
+1
+);
+
+
+if (level === 0) {
+
+if (dragData.side === "left") {
+tutorialRemovedLeft++;
+} else {
+tutorialRemovedRight++;
+}
+
+document.getElementById(
+"message"
+).innerHTML =
+"<span class='success'>" +
+"Block removed!" +
+"</span> " +
+"The block has been stored safely.";
+}
+
+
+if (level === 2) {
+
+if (dragData.side === "left") {
+level2RemovedLeft++;
+} else {
+level2RemovedRight++;
+}
+}
+
+
+if (level === 3) {
+
+if (dragData.side === "left") {
+level3RemovedLeft++;
+} else {
+level3RemovedRight++;
+}
+}
+
+
+dragData = null;
+
+render();
+}
+
+
+/* =========================================================
+LOAD LEVEL
+========================================================= */
 
 function loadLevel() {
-    leftBlocks = [{type:'x'}, {type:'x'}, {type:'x'}, {type:'w', val:1}];
-    rightBlocks = Array.from({length: 10}, () => ({type:'w', val:1}));
-    binBlocks = [];
-    document.getElementById("message").innerText = "";
-    render();
+
+dragData = null;
+
+resetUI();
+
+
+if (level === 0) {
+
+setupTutorial();
+
+tutorialStep();
+
+return;
 }
 
-window.onload = loadLevel;
+
+if (level === 1) {
+
+setupLevel1();
+
+document.getElementById(
+"levelTitle"
+).innerText =
+"Level 1 — Find x";
+
+document.getElementById(
+"instruction"
+).innerHTML =
+"Two identical mystery boxes weigh 6 altogether. " +
+"Let's find the weight of <strong>one</strong> box.";
+
+document.getElementById(
+"equationDisplay"
+).innerText =
+"2x = 6";
+
+document.getElementById(
+"checkButton"
+).classList.remove("hidden");
+
+document.getElementById(
+"restartButton"
+).classList.remove("hidden");
+
+document.getElementById(
+"nextStep"
+).classList.add("hidden");
+
+render();
+
+return;
+}
+
+
+if (level === 2) {
+
+setupLevel2();
+
+document.getElementById(
+"levelTitle"
+).innerText =
+"Level 2 — Solve the Equation";
+
+document.getElementById(
+"instruction"
+).innerHTML =
+"Now solve <strong>3x + 1 = 10</strong>.<br>" +
+"First, remove the +1 from BOTH sides.";
+
+document.getElementById(
+"equationDisplay"
+).innerText =
+"3x + 1 = 10";
+
+document.getElementById(
+"bin"
+).classList.remove("hidden");
+
+document.getElementById(
+"restartButton"
+).classList.remove("hidden");
+
+render();
+
+return;
+}
+
+
+if (level === 3) {
+
+setupLevel3();
+
+document.getElementById(
+"levelTitle"
+).innerText =
+"Level 3 — Two Mystery Boxes";
+
+document.getElementById(
+"instruction"
+).innerHTML =
+"Now we have two different variables.<br>" +
+"Use <strong>substitution</strong> to find x.";
+
+document.getElementById(
+"equationDisplay"
+).innerText =
+"x + y = 7 and y = 3";
+
+document.getElementById(
+"restartButton"
+).classList.remove("hidden");
+
+render();
+
+return;
+}
+
+
+gameComplete();
+}
+
+
+/* =========================================================
+TUTORIAL
+========================================================= */
+
+function tutorialStep() {
+
+const title =
+document.getElementById("levelTitle");
+
+const instruction =
+document.getElementById("instruction");
+
+const equation =
+document.getElementById("equationDisplay");
+
+const next =
+document.getElementById("nextStep");
+
+title.innerText =
+"Tutorial — Learn the Balance";
+
+
+/* -----------------------------------------------------
+STEP 0
+----------------------------------------------------- */
+
+if (step === 0) {
+
+instruction.innerHTML =
+"Welcome to <strong>Balance Quest!</strong> ⚖️<br>" +
+"We're going to solve algebra by keeping both " +
+"sides of the equation balanced.";
+
+equation.innerText = "";
+
+next.classList.remove("hidden");
+
+render();
+
+return;
+}
+
+
+/* -----------------------------------------------------
+STEP 1
+----------------------------------------------------- */
+
+if (step === 1) {
+
+instruction.innerHTML =
+"Purple mystery boxes all have the same unknown weight.<br>" +
+"We'll call that unknown <strong>x</strong>.";
+
+equation.innerText =
+"2x + 2 = 8";
+
+render();
+
+return;
+}
+
+
+/* -----------------------------------------------------
+STEP 2
+----------------------------------------------------- */
+
+if (step === 2) {
+
+instruction.innerHTML =
+"We want to get <strong>x</strong> by itself.<br>" +
+"First, we need to remove the two extra weights.";
+
+equation.innerText =
+"2x + 2 = 8";
+
+document.getElementById(
+"bin"
+).classList.remove("hidden");
+
+next.classList.add("hidden");
+
+render();
+
+return;
+}
+
+
+/* -----------------------------------------------------
+STEP 3
+----------------------------------------------------- */
+
+if (step === 3) {
+
+instruction.innerHTML =
+"Remove <strong>one weight from the left</strong>.<br>" +
+"Watch what happens to the balance!";
+
+equation.innerText =
+"2x + 2 = 8";
+
+document.getElementById(
+"bin"
+).classList.remove("hidden");
+
+next.classList.add("hidden");
+
+render();
+
+return;
+}
+
+
+/* -----------------------------------------------------
+STEP 4
+----------------------------------------------------- */
+
+if (step === 4) {
+
+instruction.innerHTML =
+"The scale tilted because you changed only ONE side! ⚠️<br>" +
+"In algebra, we must do the same thing to both sides.";
+
+equation.innerText =
+"2x + 2 ≠ 8";
+
+next.classList.remove("hidden");
+
+render();
+
+return;
+}
+
+
+/* -----------------------------------------------------
+STEP 5
+----------------------------------------------------- */
+
+if (step === 5) {
+
+instruction.innerHTML =
+"Now remove <strong>one weight from the right</strong> too.<br>" +
+"That keeps the equation balanced.";
+
+equation.innerText =
+"2x + 2 − 1 = 8 − 1";
+
+document.getElementById(
+"bin"
+).classList.remove("hidden");
+
+next.classList.add("hidden");
+
+render();
+
+return;
+}
+
+
+/* -----------------------------------------------------
+STEP 6
+----------------------------------------------------- */
+
+if (step === 6) {
+
+instruction.innerHTML =
+"Great! Now both sides have had the same thing removed.<br>" +
+"The balance is restored.";
+
+equation.innerText =
+"2x + 1 = 7";
+
+next.classList.remove("hidden");
+
+render();
+
+return;
+}
+
+
+/* -----------------------------------------------------
+STEP 7
+----------------------------------------------------- */
+
+if (step === 7) {
+
+instruction.innerHTML =
+"We still have <strong>one extra weight</strong> on each side.<br>" +
+"Remove that weight from BOTH sides.";
+
+equation.innerText =
+"2x + 1 = 7";
+
+document.getElementById(
+"bin"
+).classList.remove("hidden");
+
+next.classList.add("hidden");
+
+render();
+
+return;
+}
+
+
+/* -----------------------------------------------------
+STEP 8
+----------------------------------------------------- */
+
+if (step === 8) {
+
+instruction.innerHTML =
+"Excellent! Now the extra weights are gone.";
+
+equation.innerText =
+"2x = 6";
+
+document.getElementById(
+"bin"
+).classList.add("hidden");
+
+next.classList.remove("hidden");
+
+render();
+
+return;
+}
+
+
+/* -----------------------------------------------------
+STEP 9
+----------------------------------------------------- */
+
+if (step === 9) {
+
+instruction.innerHTML =
+"Now we have <strong>2x = 6</strong>.<br><br>" +
+"But we don't want to know the weight of TWO boxes.<br>" +
+"We want the weight of <strong>ONE</strong> box.";
+
+equation.innerText =
+"2x = 6";
+
+document.getElementById(
+"operationBox"
+).classList.remove("hidden");
+
+document.getElementById(
+"operationTitle"
+).innerText =
+"🧠 What should we do?";
+
+document.getElementById(
+"operationEquation"
+).innerHTML =
+"Divide BOTH sides by 2";
+
+document.getElementById(
+"operationExplanation"
+).innerHTML =
+"Because there are 2 identical x boxes, " +
+"splitting both sides into 2 equal groups leaves " +
+"one x on the left.";
+
+document.getElementById(
+"operationButton"
+).classList.remove("hidden");
+
+next.classList.add("hidden");
+
+render();
+
+return;
+}
+
+
+/* -----------------------------------------------------
+STEP 10
+----------------------------------------------------- */
+
+if (step === 10) {
+
+instruction.innerHTML =
+"Perfect! You divided BOTH sides by 2.";
+
+equation.innerHTML =
+"<strong>2x ÷ 2 = 6 ÷ 2</strong>";
+
+document.getElementById(
+"operationBox"
+).classList.remove("hidden");
+
+document.getElementById(
+"operationTitle"
+).innerText =
+"Simplify";
+
+document.getElementById(
+"operationEquation"
+).innerHTML =
+"<strong>x = 3</strong>";
+
+document.getElementById(
+"operationExplanation"
+).innerHTML =
+"The 2s cancel on the left, and 6 ÷ 2 = 3.";
+
+document.getElementById(
+"operationButton"
+).classList.remove("hidden");
+
+render();
+
+return;
+}
+
+
+/* -----------------------------------------------------
+STEP 11
+----------------------------------------------------- */
+
+if (step === 11) {
+
+instruction.innerHTML =
+"🎉 You solved your first algebra equation!<br><br>" +
+"The important rule is:<br>" +
+"<strong>Whatever you do to one side, do to the other.</strong>";
+
+equation.innerHTML =
+"<strong>x = 3</strong>";
+
+document.getElementById(
+"operationBox"
+).classList.add("hidden");
+
+document.getElementById(
+"message"
+).innerHTML =
+"<span class='success'>" +
+"Each mystery box weighs 3!" +
+"</span>";
+
+next.classList.remove("hidden");
+
+next.innerText =
+"Start Level 1 →";
+
+render();
+
+return;
+}
+}
+
+
+/* =========================================================
+NEXT STEP
+========================================================= */
+
+function nextStep() {
+
+if (level === 0) {
+
+/*
+STEP 3:
+Need first removal.
+*/
+
+if (step === 3) {
+
+if (
+tutorialRemovedLeft +
+tutorialRemovedRight === 0
+) {
+
+document.getElementById(
+"message"
+).innerHTML =
+"<span class='warning'>" +
+"Drag one blue weight into the bin first!" +
+"</span>";
+
+return;
+}
+
+step = 4;
+
+tutorialStep();
+
+return;
+}
+
+
+/*
+STEP 5:
+Need second removal.
+*/
+
+if (step === 5) {
+
+if (
+tutorialRemovedLeft !== 1 ||
+tutorialRemovedRight !== 1
+) {
+
+document.getElementById(
+"message"
+).innerHTML =
+"<span class='warning'>" +
+"Remove one weight from the other side too!" +
+"</span>";
+
+return;
+}
+
+step = 6;
+
+tutorialStep();
+
+return;
+}
+
+
+/*
+STEP 7:
+Need two removals from each side.
+*/
+
+if (step === 7) {
+
+if (
+tutorialRemovedLeft !== 2 ||
+tutorialRemovedRight !== 2
+) {
+
+document.getElementById(
+"message"
+).innerHTML =
+"<span class='warning'>" +
+"Remove one more weight from BOTH sides!" +
+"</span>";
+
+return;
+}
+
+step = 8;
+
+tutorialStep();
+
+return;
+}
+
+
+step++;
+
+if (step >= 12) {
+
+level = 1;
+
+loadLevel();
+
+return;
+}
+
+tutorialStep();
+
+return;
+}
+
+
+if (level === 3) {
+
+level3Next();
+
+return;
+}
+}
+
+
+/* =========================================================
+OPERATION BUTTON
+========================================================= */
+
+function performOperation() {
+
+/*
+Tutorial:
+2x = 6 → x = 3
+*/
+
+if (level === 0 && step === 9) {
+
+step = 10;
+
+tutorialStep();
+
+return;
+}
+
+
+if (level === 0 && step === 10) {
+
+step = 11;
+
+tutorialStep();
+
+return;
+}
+}
+
+
+/* =========================================================
+LEVEL 1 CHECK
+========================================================= */
+
+function checkProgress() {
+
+const message =
+document.getElementById("message");
+
+
+/* -----------------------------------------------------
+LEVEL 1
+----------------------------------------------------- */
+
+if (level === 1) {
+
+message.innerHTML =
+"<span class='success'>🎉 Correct!</span><br>" +
+"You found the mystery box's weight:<br>" +
+"<strong>2x = 6 → x = 3</strong><br><br>" +
+"To find one x, divide BOTH sides by 2.";
+
+document.getElementById(
+"checkButton"
+).classList.add("hidden");
+
+const next =
+document.getElementById(
+"nextStep"
+);
+
+next.classList.remove("hidden");
+
+next.innerText =
+"Start Level 2 →";
+
+next.onclick = () => {
+
+level = 2;
+
+loadLevel();
+};
+
+return;
+}
+
+
+/* -----------------------------------------------------
+LEVEL 2
+----------------------------------------------------- */
+
+if (level === 2) {
+
+if (
+level2RemovedLeft === 1 &&
+level2RemovedRight === 1
+) {
+
+/*
+After removing 1 from each side:
+3x = 9
+*/
+
+document.getElementById(
+"equationDisplay"
+).innerText =
+"3x = 9";
+
+
+document.getElementById(
+"instruction"
+).innerHTML =
+"Great! Now you have <strong>3x = 9</strong>.<br>" +
+"There are 3 mystery boxes, so divide BOTH sides by 3.";
+
+
+document.getElementById(
+"operationBox"
+).classList.remove("hidden");
+
+
+document.getElementById(
+"operationTitle"
+).innerText =
+"🧠 Divide BOTH sides by 3";
+
+
+document.getElementById(
+"operationEquation"
+).innerHTML =
+"3x ÷ 3 = 9 ÷ 3";
+
+
+document.getElementById(
+"operationExplanation"
+).innerHTML =
+"The 3 mystery boxes are split into 3 equal groups. " +
+"That leaves one x.";
+
+
+document.getElementById(
+"operationButton"
+).classList.remove("hidden");
+
+
+document.getElementById(
+"checkButton"
+).classList.add("hidden");
+
+
+document.getElementById(
+"bin"
+).classList.add("hidden");
+
+
+document.getElementById(
+"operationButton"
+).onclick = () => {
+
+document.getElementById(
+"operationEquation"
+).innerHTML =
+"<strong>x = 3</strong>";
+
+document.getElementById(
+"operationExplanation"
+).innerHTML =
+"9 ÷ 3 = 3, so <strong>x = 3</strong>.";
+
+document.getElementById(
+"operationButton"
+).classList.add("hidden");
+
+
+document.getElementById(
+"message"
+).innerHTML =
+"<span class='success'>" +
+"🎉 You solved it! x = 3" +
+"</span>";
+
+
+const next =
+document.getElementById(
+"nextStep"
+);
+
+next.classList.remove("hidden");
+
+next.innerText =
+"Start Level 3 →";
+
+next.onclick = () => {
+
+level = 3;
+
+loadLevel();
+};
+};
+
+}
+
+else {
+
+message.innerHTML =
+"<span class='warning'>" +
+"Not quite!</span><br>" +
+"Remove exactly 1 weight from BOTH sides.";
+}
+
+return;
+}
+
+
+/* -----------------------------------------------------
+LEVEL 3
+----------------------------------------------------- */
+
+if (level === 3) {
+
+level3Check();
+
+}
+}
+
+
+/* =========================================================
+LEVEL 3 PROGRESSION
+========================================================= */
+
+let level3Step = 0;
+
+function level3Next() {
+
+if (level3Step === 0) {
+
+document.getElementById(
+"instruction"
+).innerHTML =
+"Look at <strong>Scale B</strong>.<br>" +
+"It tells us directly that <strong>y = 3</strong>.";
+
+document.getElementById(
+"card-y"
+).classList.add("highlight");
+
+document.getElementById(
+"equationDisplay"
+).innerText =
+"y = 3";
+
+level3Step = 1;
+
+return;
+}
+
+
+if (level3Step === 1) {
+
+document.getElementById(
+"card-y"
+).classList.remove("highlight");
+
+document.getElementById(
+"card-xy"
+).classList.add("highlight");
+
+
+document.getElementById(
+"instruction"
+).innerHTML =
+"Now substitute <strong>y = 3</strong> into " +
+"<strong>x + y = 7</strong>.";
+
+document.getElementById(
+"equationDisplay"
+).innerHTML =
+"<strong>x + y = 7</strong>";
+
+
+const box =
+document.getElementById(
+"substitutionBox"
+);
+
+box.classList.remove("hidden");
+
+box.innerHTML =
+"<strong>y = 3</strong><br><br>" +
+"x + y = 7<br>" +
+"↓<br>" +
+"x + 3 = 7";
+
+
+setTimeout(() => {
+
+const scale =
+getScale("xy");
+
+scale.left = [
+{type:"x"},
+...weights(3)
+];
+
+
+document.getElementById(
+"equationDisplay"
+).innerHTML =
+"<strong>x + 3 = 7</strong>";
+
+
+document.getElementById(
+"instruction"
+).innerHTML =
+"The y block has been replaced with 3.<br>" +
+"Now solve <strong>x + 3 = 7</strong> " +
+"using the same balance rule.";
+
+document.getElementById(
+"bin"
+).classList.remove("hidden");
+
+
+document.getElementById(
+"checkButton"
+).classList.remove("hidden");
+
+
+level3Step = 2;
+
+render();
+
+}, 800);
+
+return;
+}
+}
+
+
+/* =========================================================
+LEVEL 3 CHECK
+========================================================= */
+
+function level3Check() {
+
+if (
+level3RemovedLeft === 3 &&
+level3RemovedRight === 3
+) {
+
+document.getElementById(
+"equationDisplay"
+).innerHTML =
+"<strong>x = 4</strong>";
+
+document.getElementById(
+"instruction"
+).innerHTML =
+"🎉 You removed 3 from BOTH sides!<br>" +
+"That leaves <strong>x = 4</strong>.";
+
+document.getElementById(
+"message"
+).innerHTML =
+"<span class='success'>" +
+"🏆 Amazing! You solved a two-variable equation using substitution." +
+"</span>";
+
+document.getElementById(
+"checkButton"
+).classList.add("hidden");
+
+document.getElementById(
+"bin"
+).classList.add("hidden");
+
+
+const next =
+document.getElementById(
+"nextStep"
+);
+
+next.classList.remove("hidden");
+
+next.innerText =
+"Finish Game 🏆";
+
+next.onclick = () => {
+
+level = 4;
+
+loadLevel();
+};
+
+}
+
+else {
+
+document.getElementById(
+"message"
+).innerHTML =
+"<span class='warning'>" +
+"Remember: whatever you remove from one side, " +
+"remove from the other side too!" +
+"</span>";
+}
+}
+
+
+/* =========================================================
+RESTART
+========================================================= */
+
+function restartLevel() {
+
+dragData = null;
+
+level3Step = 0;
+
+loadLevel();
+}
+
+
+/* =========================================================
+GAME COMPLETE
+========================================================= */
+
+function gameComplete() {
+
+document.getElementById(
+"levelTitle"
+).innerText =
+"🏆 Balance Quest Complete!";
+
+
+document.getElementById(
+"instruction"
+).innerHTML =
+"You've learned the foundations of solving algebra equations!";
+
+
+document.getElementById(
+"equationDisplay"
+).innerHTML =
+"<strong>x = 3 &nbsp; • &nbsp; x = 3 &nbsp; • &nbsp; x = 4</strong>";
+
+
+document.getElementById(
+"balanceRow"
+).innerHTML = "";
+
+
+document.getElementById(
+"operationBox"
+).classList.add("hidden");
+
+
+document.getElementById(
+"bin"
+).classList.add("hidden");
+
+
+document.getElementById(
+"checkButton"
+).classList.add("hidden");
+
+
+document.getElementById(
+"restartButton"
+).classList.add("hidden");
+
+
+document.getElementById(
+"nextStep"
+).classList.add("hidden");
+
+
+document.getElementById(
+"operationButton"
+).classList.add("hidden");
+
+
+document.getElementById(
+"message"
+).innerHTML =
+"<span class='success'>What you learned:</span><br><br>" +
+"🟪 Variables represent unknown values<br>" +
+"⚖️ Both sides of an equation must stay equal<br>" +
+"➖ Whatever you do to one side, do to the other<br>" +
+"➗ Divide both sides to isolate a variable<br>" +
+"✨ Substitute known values to solve for other variables";
+}
+
+
+/* =========================================================
+START
+========================================================= */
+
+loadLevel();
+
 </script>
 
 </body>
