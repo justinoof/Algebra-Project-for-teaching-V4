@@ -2,23 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Balance Quest — Learn Algebra</title>
-
-<!-- Modern UI Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
-
-<!-- Canvas Confetti Library -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <style>
 :root {
     --purple: #8b5cf6;
     --purple-dark: #6d28d9;
-    --pink: #ec4899;
-    --blue: #3b82f6;
     --green: #10b981;
     --red: #ef4444;
     --dark: #0f172a;
@@ -27,848 +21,207 @@
     --card-bg: #ffffff;
 }
 
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; touch-action: none; }
+body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg-gradient); color: var(--dark); text-align: center; min-height: 100vh; user-select: none; }
+h1, h2, h3, .equation-display { font-family: 'Outfit', sans-serif; }
+header { background: linear-gradient(135deg, #7c3aed, #2563eb); color: white; padding: 20px; }
+header h1 { margin: 0; font-size: 2rem; }
 
-body {
-    margin: 0;
-    font-family: 'Inter', sans-serif;
-    background: var(--bg-gradient);
-    color: var(--dark);
-    text-align: center;
-    min-height: 100vh;
-}
+.game { max-width: 900px; margin: 20px auto; padding: 0 15px 40px; }
+.card { background: var(--card-bg); border-radius: 24px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+.equation-display { font-size: 2.2rem; margin: 15px 0; font-weight: 700; color: var(--purple-dark); }
 
-h1, h2, h3, .equation-display, .operation-equation {
-    font-family: 'Outfit', sans-serif;
-}
+.balance-row { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin: 20px 0; }
+.scale-card { flex: 1; min-width: 280px; background: #f8fafc; border-radius: 20px; padding: 15px; border: 2px solid #e2e8f0; }
+.scale { position: relative; height: 220px; margin-top: 10px; }
 
-header {
-    background: linear-gradient(135deg, #7c3aed, #2563eb);
-    color: white;
-    padding: 25px 20px;
-    box-shadow: 0 4px 20px rgba(124, 58, 237, 0.15);
-}
+.beam { position: absolute; top: 150px; left: 10%; width: 80%; height: 10px; background: #475569; border-radius: 10px; }
+.pivot { position: absolute; top: 160px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 30px solid transparent; border-right: 30px solid transparent; border-bottom: 50px solid #64748b; }
 
-header h1 {
-    margin: 0;
-    font-size: 2.2rem;
-}
+.pan { position: absolute; top: 20px; width: 42%; min-height: 100px; padding: 8px; display: flex; align-items: flex-end; justify-content: center; flex-wrap: wrap; gap: 6px; border-bottom: 5px solid #94a3b8; border-radius: 0 0 12px 12px; }
+.pan.left { left: 4%; } .pan.right { right: 4%; }
 
-header p {
-    margin: 6px 0 0;
-    opacity: 0.9;
-    font-size: 1rem;
-}
-
-.game {
-    max-width: 1000px;
-    margin: 20px auto;
-    padding: 0 15px 40px;
-}
-
-.card {
-    background: var(--card-bg);
-    border-radius: 24px;
-    padding: 30px;
-    box-shadow: 0 20px 40px -15px rgba(0,0,0,0.07);
-    border: 1px solid rgba(226, 232, 240, 0.8);
-}
-
-#levelTitle {
-    margin-top: 0;
-    font-size: 1.8rem;
-}
-
-#instruction {
-    font-size: 1.15rem;
-    min-height: 50px;
-    line-height: 1.6;
-    color: #334155;
-}
-
-.equation-display {
-    font-size: 2.2rem;
-    margin: 15px 0;
-    font-weight: 700;
-    color: var(--purple-dark);
-    min-height: 48px;
-}
-
-.operation-box {
-    background: #f5f3ff;
-    border: 2px dashed #c4b5fd;
-    border-radius: 18px;
-    padding: 20px;
-    margin: 20px auto;
-    max-width: 650px;
-}
-
-.operation-title {
-    font-size: 1.2rem;
-    font-weight: 700;
-    margin-bottom: 6px;
-    color: var(--purple-dark);
-}
-
-.operation-equation {
-    font-size: 1.5rem;
-    margin: 10px;
-}
-
-.balance-row {
-    display: flex;
-    justify-content: center;
-    gap: 25px;
-    flex-wrap: wrap;
-    margin: 20px 0;
-}
-
-.scale-card {
-    flex: 1;
-    min-width: 300px;
-    background: #f8fafc;
-    border-radius: 20px;
-    padding: 20px;
-    border: 2px solid #e2e8f0;
-}
-
-.scale {
-    position: relative;
-    height: 240px;
-    margin-top: 10px;
-}
-
-.beam {
-    position: absolute;
-    top: 160px;
-    left: 10%;
-    width: 80%;
-    height: 12px;
-    background: #475569;
-    border-radius: 10px;
-    transform-origin: center;
-    transition: transform 0.5s ease;
-}
-
-.pivot {
-    position: absolute;
-    top: 171px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 40px solid transparent;
-    border-right: 40px solid transparent;
-    border-bottom: 65px solid #64748b;
-}
-
-.pan {
-    position: absolute;
-    top: 25px;
-    width: 42%;
-    min-height: 110px;
-    padding: 8px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 6px;
-    border-bottom: 5px solid #94a3b8;
-    border-radius: 0 0 12px 12px;
-}
-
-.pan.left { left: 4%; }
-.pan.right { right: 4%; }
-
-.block {
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 18px;
-    font-weight: 700;
-    font-family: 'Outfit', sans-serif;
-    user-select: none;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.12);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.block.interactive {
-    cursor: pointer;
-}
-
-.block.interactive:hover {
-    transform: translateY(-4px) scale(1.08);
-    box-shadow: 0 8px 18px rgba(0,0,0,0.2);
-}
-
-.block.dragging { opacity: 0.3; }
+.block { width: 46px; height: 46px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; font-weight: 700; font-family: 'Outfit', sans-serif; box-shadow: 0 4px 8px rgba(0,0,0,0.15); cursor: grab; }
 .x-block { background: linear-gradient(135deg, #a855f7, #7c3aed); }
 .y-block { background: linear-gradient(135deg, #f472b6, #db2777); }
-.weight-block { background: linear-gradient(135deg, #60a5fa, #2563eb); }
+.weight-block { background: linear-gradient(135deg, #60a5fa, #2563eb); width: 38px; height: 38px; font-size: 15px; }
 
-.block.small {
-    width: 38px;
-    height: 38px;
-    font-size: 15px;
-    border-radius: 10px;
-}
+.bin { margin: 20px auto; width: 280px; min-height: 90px; border: 2px dashed #cbd5e1; border-radius: 16px; padding: 10px; background: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.bin.active { background: #fef2f2; border-color: var(--red); }
+.inventory { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
 
-.bin {
-    margin: 20px auto;
-    width: 280px;
-    min-height: 95px;
-    border: 2px dashed #cbd5e1;
-    border-radius: 20px;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: #f8fafc;
-    transition: all 0.2s ease;
-}
-
-.bin.over {
-    background: #fef2f2;
-    border-color: var(--red);
-    transform: scale(1.02);
-}
-
-.inventory {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 6px;
-    min-height: 40px;
-    margin-top: 6px;
-}
-
-.controls {
-    margin-top: 20px;
-}
-
-button {
-    border: none;
-    border-radius: 14px;
-    padding: 13px 26px;
-    margin: 5px;
-    background: var(--purple);
-    color: white;
-    font-size: 1rem;
-    font-weight: 600;
-    font-family: 'Inter', sans-serif;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
-}
-
-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(139, 92, 246, 0.35);
-}
-
-button.green {
-    background: var(--green);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-}
-
-button.secondary {
-    background: var(--muted);
-    box-shadow: none;
-}
-
+button { border: none; border-radius: 12px; padding: 12px 24px; margin: 5px; background: var(--purple); color: white; font-size: 1rem; font-weight: 600; cursor: pointer; }
+button.green { background: var(--green); }
+button.secondary { background: var(--muted); }
 .hidden { display: none !important; }
-
-.message {
-    min-height: 45px;
-    margin-top: 15px;
-    font-size: 1.1rem;
-    font-weight: 600;
-}
-
-.success { color: #059669; }
-.warning { color: #dc2626; }
-
-@media(max-width: 700px) {
-    .scale-card { min-width: 100%; }
-    .block { width: 42px; height: 42px; }
-}
+.message { min-height: 35px; margin-top: 15px; font-size: 1.1rem; font-weight: 600; }
+.success { color: #059669; } .warning { color: #dc2626; }
 </style>
 </head>
-
 <body>
 
 <header>
     <h1>⚖️ Balance Quest</h1>
-    <p>Learn algebra visually by keeping the scale balanced!</p>
 </header>
 
 <div class="game">
 <div class="card">
-
-    <h2 id="levelTitle">Tutorial</h2>
-    <div id="instruction"></div>
-    <div id="equationDisplay" class="equation-display"></div>
-
-    <div id="operationBox" class="operation-box hidden">
-        <div id="operationTitle" class="operation-title"></div>
-        <div id="operationEquation" class="operation-equation"></div>
-        <div id="operationExplanation"></div>
-    </div>
+    <h2 id="levelTitle">Level 1</h2>
+    <div id="instruction">Drag or Tap weight blocks into the bin!</div>
+    <div id="equationDisplay" class="equation-display">3x + 1 = 10</div>
 
     <div id="balanceRow" class="balance-row"></div>
 
-    <div id="bin" class="bin hidden">
-        <strong>🗑️ Removed Blocks</strong>
+    <div id="bin" class="bin">
+        <strong>🗑️ Drop or Tap Blocks Here</strong>
         <div id="inventory" class="inventory"></div>
-        <small style="color: var(--muted); margin-top: 4px;">Click or drag blocks here to remove</small>
     </div>
 
     <div class="controls">
-        <button id="nextStep" onclick="nextStep()">Next →</button>
-        <button id="operationButton" class="green hidden" onclick="performOperation()">Do This Operation →</button>
-        <button id="checkButton" class="green hidden" onclick="checkProgress()">Check</button>
-        <button id="restartButton" class="secondary hidden" onclick="restartLevel()">Restart Level</button>
+        <button id="checkBtn" class="green hidden" onclick="checkSolve()">Check Solution</button>
+        <button id="resetBtn" class="secondary" onclick="loadLevel()">Reset Level</button>
     </div>
 
     <div id="message" class="message"></div>
-
 </div>
 </div>
 
 <script>
-let level = 0;
-let step = 0;
-let scales = [];
-let removedBlocks = [];
+let level = 1;
+let leftBlocks = [{type:'x'}, {type:'x'}, {type:'x'}, {type:'w', val:1}];
+let rightBlocks = Array.from({length: 10}, () => ({type:'w', val:1}));
+let binBlocks = [];
 
-let tutorialRemovedLeft = 0;
-let tutorialRemovedRight = 0;
-let level2RemovedLeft = 0;
-let level2RemovedRight = 0;
-
-let dragData = null;
-
-function triggerConfetti() {
-    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-}
-
-function weights(number) {
-    return Array.from({length: number}, () => ({ type: "weight", value: 1 }));
-}
-
-function getScale(id) {
-    return scales.find(scale => scale.id === id);
-}
-
-function resetRemoved() {
-    removedBlocks = [];
-}
-
-function resetUI() {
-    document.getElementById("message").innerHTML = "";
-    document.getElementById("operationBox").classList.add("hidden");
-    document.getElementById("operationButton").classList.add("hidden");
-    document.getElementById("checkButton").classList.add("hidden");
-    document.getElementById("bin").classList.add("hidden");
-
-    const next = document.getElementById("nextStep");
-    next.classList.remove("hidden");
-    next.innerText = "Next →";
-    next.onclick = nextStep;
-}
-
-function restartLevel() {
-    loadLevel();
-}
-
-/* =========================================================
-   LEVEL SETUPS
-========================================================= */
-function setupTutorial() {
-    resetRemoved();
-    tutorialRemovedLeft = 0;
-    tutorialRemovedRight = 0;
-    scales = [{
-        id: "main",
-        left: [{type:"x"}, {type:"x"}, ...weights(2)],
-        right: weights(8)
-    }];
-}
-
-function setupLevel1() {
-    resetRemoved();
-    scales = [{
-        id: "main",
-        left: [{type:"x"}, {type:"x"}],
-        right: weights(6)
-    }];
-}
-
-function setupLevel2() {
-    resetRemoved();
-    level2RemovedLeft = 0;
-    level2RemovedRight = 0;
-    scales = [{
-        id: "main",
-        left: [{type:"x"}, {type:"x"}, {type:"x"}, {type:"weight", value:1}],
-        right: weights(10)
-    }];
-}
-
-function setupLevel3() {
-    resetRemoved();
-    scales = [
-        {
-            id: "xy",
-            title: "Scale A",
-            left: [{type:"x"}, {type:"y"}],
-            right: weights(7)
-        },
-        {
-            id: "y",
-            title: "Scale B",
-            left: [{type:"y"}],
-            right: weights(3)
-        }
-    ];
-}
-
-/* =========================================================
-   RENDER LOGIC
-========================================================= */
 function render() {
     const row = document.getElementById("balanceRow");
-    row.innerHTML = "";
+    row.innerHTML = `
+        <div class="scale-card">
+            <div class="scale">
+                <div class="pan left" id="pan-left"></div>
+                <div class="pan right" id="pan-right"></div>
+                <div class="beam"></div>
+                <div class="pivot"></div>
+            </div>
+        </div>
+    `;
 
-    scales.forEach(scale => {
-        const card = document.createElement("div");
-        card.className = "scale-card";
-        card.id = "card-" + scale.id;
+    const leftPan = document.getElementById("pan-left");
+    const rightPan = document.getElementById("pan-right");
 
-        if (scale.title) {
-            const title = document.createElement("h3");
-            title.innerText = scale.title;
-            title.style.margin = "0 0 10px 0";
-            card.appendChild(title);
+    leftBlocks.forEach((b, i) => leftPan.appendChild(createBlockElem(b, 'left', i)));
+    rightBlocks.forEach((b, i) => rightPan.appendChild(createBlockElem(b, 'right', i)));
+
+    const inv = document.getElementById("inventory");
+    inv.innerHTML = "";
+    binBlocks.forEach(b => {
+        const el = document.createElement("div");
+        el.className = "block weight-block";
+        el.innerText = "1";
+        inv.appendChild(el);
+    });
+
+    checkState();
+}
+
+function createBlockElem(block, side, index) {
+    const el = document.createElement("div");
+    el.className = `block ${block.type === 'x' ? 'x-block' : 'weight-block'}`;
+    el.innerText = block.type === 'x' ? 'x' : '1';
+
+    if (block.type === 'w') {
+        attachCustomPointerDrag(el, side, index);
+    }
+    return el;
+}
+
+function attachCustomPointerDrag(el, side, index) {
+    el.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        
+        // Tap/click fallback
+        let moved = false;
+        const startX = e.clientX;
+        const startY = e.clientY;
+
+        const clone = el.cloneNode(true);
+        clone.style.position = "fixed";
+        clone.style.zIndex = "1000";
+        clone.style.pointerEvents = "none";
+        clone.style.left = `${e.clientX - 20}px`;
+        clone.style.top = `${e.clientY - 20}px`;
+        document.body.appendChild(clone);
+        el.style.opacity = "0.3";
+
+        function onPointerMove(ev) {
+            if (Math.abs(ev.clientX - startX) > 5 || Math.abs(ev.clientY - startY) > 5) {
+                moved = true;
+            }
+            clone.style.left = `${ev.clientX - 20}px`;
+            clone.style.top = `${ev.clientY - 20}px`;
+
+            const bin = document.getElementById("bin").getBoundingClientRect();
+            if (ev.clientX >= bin.left && ev.clientX <= bin.right && ev.clientY >= bin.top && ev.clientY <= bin.bottom) {
+                document.getElementById("bin").classList.add("active");
+            } else {
+                document.getElementById("bin").classList.remove("active");
+            }
         }
 
-        const visual = document.createElement("div");
-        visual.className = "scale";
+        function onPointerUp(ev) {
+            window.removeEventListener("pointermove", onPointerMove);
+            window.removeEventListener("pointerup", onPointerUp);
+            document.body.removeChild(clone);
+            el.style.opacity = "1";
+            document.getElementById("bin").classList.remove("active");
 
-        const left = document.createElement("div");
-        left.className = "pan left";
-        const right = document.createElement("div");
-        right.className = "pan right";
+            const bin = document.getElementById("bin").getBoundingClientRect();
+            const droppedInBin = (ev.clientX >= bin.left && ev.clientX <= bin.right && ev.clientY >= bin.top && ev.clientY <= bin.bottom);
 
-        scale.left.forEach((block, index) => {
-            left.appendChild(createBlock(block, scale.id, "left", index));
-        });
+            // If tapped OR dragged into bin, execute removal
+            if (!moved || droppedInBin) {
+                removeWeight(side, index);
+            }
+        }
 
-        scale.right.forEach((block, index) => {
-            right.appendChild(createBlock(block, scale.id, "right", index));
-        });
-
-        const beam = document.createElement("div");
-        beam.className = "beam";
-        const pivot = document.createElement("div");
-        pivot.className = "pivot";
-
-        visual.appendChild(left);
-        visual.appendChild(right);
-        visual.appendChild(beam);
-        visual.appendChild(pivot);
-
-        card.appendChild(visual);
-        row.appendChild(card);
-
-        updateTilt(scale);
+        window.addEventListener("pointermove", onPointerMove);
+        window.addEventListener("pointerup", onPointerUp);
     });
-
-    renderInventory();
 }
 
-function createBlock(block, scaleID, side, index) {
-    const element = document.createElement("div");
-    element.className = "block";
-
-    if (block.type === "x") {
-        element.classList.add("x-block");
-        element.innerText = "x";
-    } else if (block.type === "y") {
-        element.classList.add("y-block");
-        element.innerText = "y";
+function removeWeight(side, index) {
+    if (side === 'left') {
+        binBlocks.push(leftBlocks.splice(index, 1)[0]);
     } else {
-        element.classList.add("weight-block", "small");
-        element.innerText = block.value;
+        binBlocks.push(rightBlocks.splice(index, 1)[0]);
     }
-
-    if (canDrag(block)) {
-        element.classList.add("interactive");
-        element.draggable = true;
-
-        // Click / Tap to Remove
-        element.addEventListener("click", () => {
-            dragData = { scaleID, side, index, block };
-            removeBlock();
-        });
-
-        // Drag handlers
-        element.addEventListener("dragstart", () => {
-            dragData = { scaleID, side, index, block };
-            element.classList.add("dragging");
-        });
-
-        element.addEventListener("dragend", () => {
-            element.classList.remove("dragging");
-        });
-    }
-
-    return element;
-}
-
-function canDrag(block) {
-    if (block.type !== "weight") return false;
-    if (level === 0) return (step === 3 || step === 5 || step === 7);
-    if (level === 2) return true;
-    return false;
-}
-
-function renderInventory() {
-    const inventory = document.getElementById("inventory");
-    inventory.innerHTML = "";
-    removedBlocks.forEach(item => {
-        const block = document.createElement("div");
-        block.className = "block weight-block small";
-        block.innerText = item.block.value;
-        inventory.appendChild(block);
-    });
-}
-
-function updateTilt(scale) {
-    const beam = document.querySelector("#card-" + scale.id + " .beam");
-    if (!beam) return;
-
-    if (level === 0) {
-        if (tutorialRemovedLeft > tutorialRemovedRight) beam.style.transform = "rotate(-7deg)";
-        else if (tutorialRemovedRight > tutorialRemovedLeft) beam.style.transform = "rotate(7deg)";
-        else beam.style.transform = "rotate(0deg)";
-        return;
-    }
-
-    if (level === 2) {
-        if (level2RemovedLeft > level2RemovedRight) beam.style.transform = "rotate(-7deg)";
-        else if (level2RemovedRight > level2RemovedLeft) beam.style.transform = "rotate(7deg)";
-        else beam.style.transform = "rotate(0deg)";
-        return;
-    }
-
-    beam.style.transform = "rotate(0deg)";
-}
-
-/* =========================================================
-   DRAG & DROP BIN
-========================================================= */
-const bin = document.getElementById("bin");
-bin.addEventListener("dragover", event => {
-    event.preventDefault();
-    bin.classList.add("over");
-});
-bin.addEventListener("dragleave", () => bin.classList.remove("over"));
-bin.addEventListener("drop", event => {
-    event.preventDefault();
-    bin.classList.remove("over");
-    if (dragData) removeBlock();
-});
-
-function removeBlock() {
-    if (!dragData) return;
-    const scale = getScale(dragData.scaleID);
-    if (!scale) return;
-
-    removedBlocks.push({
-        level,
-        scaleID: dragData.scaleID,
-        side: dragData.side,
-        block: {...dragData.block}
-    });
-
-    scale[dragData.side].splice(dragData.index, 1);
-
-    if (level === 0) {
-        if (dragData.side === "left") tutorialRemovedLeft++;
-        else tutorialRemovedRight++;
-        document.getElementById("message").innerHTML = "<span class='success'>Block removed!</span>";
-    }
-
-    if (level === 2) {
-        if (dragData.side === "left") level2RemovedLeft++;
-        else level2RemovedRight++;
-        checkLevel2DragProgress();
-    }
-
-    dragData = null;
     render();
 }
 
-/* =========================================================
-   LEVEL FLOW
-========================================================= */
-function loadLevel() {
-    dragData = null;
-    resetUI();
+function checkState() {
+    const leftW = leftBlocks.filter(b => b.type === 'w').length;
+    const rightW = rightBlocks.filter(b => b.type === 'w').length;
 
-    if (level === 0) {
-        setupTutorial();
-        tutorialStep();
-        return;
-    }
-
-    if (level === 1) {
-        setupLevel1();
-        document.getElementById("levelTitle").innerText = "Level 1 — Find x";
-        document.getElementById("instruction").innerHTML = "Two mystery boxes weigh 6 altogether.<br>Find the weight of <strong>one</strong> box.";
-        document.getElementById("equationDisplay").innerText = "2x = 6";
-        document.getElementById("checkButton").classList.remove("hidden");
-        document.getElementById("restartButton").classList.remove("hidden");
-        document.getElementById("nextStep").classList.add("hidden");
-        render();
-        return;
-    }
-
-    if (level === 2) {
-        setupLevel2();
-        document.getElementById("levelTitle").innerText = "Level 2 — Solve 3x + 1 = 10";
-        document.getElementById("instruction").innerHTML = "Click or drag the <strong>+1 weight block</strong> off BOTH sides to balance!";
-        document.getElementById("equationDisplay").innerText = "3x + 1 = 10";
-        document.getElementById("bin").classList.remove("hidden");
-        document.getElementById("restartButton").classList.remove("hidden");
-        document.getElementById("nextStep").classList.add("hidden");
-        render();
-        return;
-    }
-
-    if (level === 3) {
-        setupLevel3();
-        document.getElementById("levelTitle").innerText = "Level 3 — Two Mystery Variables";
-        document.getElementById("instruction").innerHTML = "Scale B tells us <strong>y = 3</strong>.<br>Substitute 3 for y in Scale A!";
-        document.getElementById("equationDisplay").innerText = "x + y = 7  |  y = 3";
-        document.getElementById("restartButton").classList.remove("hidden");
-        document.getElementById("checkButton").classList.remove("hidden");
-        document.getElementById("nextStep").classList.add("hidden");
-        render();
-        return;
-    }
-
-    gameComplete();
-}
-
-function checkLevel2DragProgress() {
-    if (level2RemovedLeft === 1 && level2RemovedRight === 1) {
+    if (leftW === 0 && rightW === 9) {
         document.getElementById("equationDisplay").innerText = "3x = 9";
-        document.getElementById("instruction").innerHTML = "Great! Now you have <strong>3x = 9</strong>.<br>Click Check to divide both sides by 3.";
-        document.getElementById("bin").classList.add("hidden");
-        document.getElementById("checkButton").classList.remove("hidden");
+        document.getElementById("instruction").innerText = "Great! Both sides reduced cleanly. Click Check!";
+        document.getElementById("checkBtn").classList.remove("hidden");
+    } else {
+        document.getElementById("equationDisplay").innerText = `3x ${leftW ? '+ ' + leftW : ''} = ${rightW}`;
+        document.getElementById("checkBtn").classList.add("hidden");
     }
 }
 
-/* =========================================================
-   TUTORIAL STEPS
-========================================================= */
-function tutorialStep() {
-    const title = document.getElementById("levelTitle");
-    const instruction = document.getElementById("instruction");
-    const equation = document.getElementById("equationDisplay");
-    const next = document.getElementById("nextStep");
-
-    title.innerText = "Tutorial — Learn the Balance";
-
-    if (step === 0) {
-        instruction.innerHTML = "Welcome to <strong>Balance Quest!</strong> ⚖️<br>We solve equations by keeping both sides balanced.";
-        equation.innerText = "";
-        render();
-        return;
-    }
-    if (step === 1) {
-        instruction.innerHTML = "Purple mystery boxes all have unknown weight <strong>x</strong>.";
-        equation.innerText = "2x + 2 = 8";
-        render();
-        return;
-    }
-    if (step === 2) {
-        instruction.innerHTML = "We want <strong>x</strong> by itself. Let me show you how to remove weights.";
-        equation.innerText = "2x + 2 = 8";
-        next.classList.remove("hidden");
-        render();
-        return;
-    }
-    if (step === 3) {
-        instruction.innerHTML = "<strong>Click or drag one blue weight from the left side</strong> to remove it.";
-        equation.innerText = "2x + 2 = 8";
-        document.getElementById("bin").classList.remove("hidden");
-        next.classList.add("hidden");
-        render();
-        return;
-    }
-    if (step === 4) {
-        instruction.innerHTML = "The scale tilted! ⚠️ In algebra, we must do the same operation to both sides.";
-        equation.innerText = "2x + 1 ≠ 8";
-        next.classList.remove("hidden");
-        render();
-        return;
-    }
-    if (step === 5) {
-        instruction.innerHTML = "Now <strong>click or drag one weight from the right side</strong> to rebalance.";
-        equation.innerText = "2x + 1 = 8 - 1";
-        document.getElementById("bin").classList.remove("hidden");
-        next.classList.add("hidden");
-        render();
-        return;
-    }
-    if (step === 6) {
-        instruction.innerHTML = "Great! The scale is level again.";
-        equation.innerText = "2x + 1 = 7";
-        next.classList.remove("hidden");
-        render();
-        return;
-    }
-    if (step === 7) {
-        instruction.innerHTML = "Click or drag the remaining extra weight from BOTH sides.";
-        equation.innerText = "2x + 1 = 7";
-        document.getElementById("bin").classList.remove("hidden");
-        next.classList.add("hidden");
-        render();
-        return;
-    }
-    if (step === 8) {
-        instruction.innerHTML = "Excellent! Extra weights removed cleanly.";
-        equation.innerText = "2x = 6";
-        document.getElementById("bin").classList.add("hidden");
-        next.classList.remove("hidden");
-        render();
-        return;
-    }
-    if (step === 9) {
-        instruction.innerHTML = "We have 2x = 6. Let's divide to find 1 box.";
-        equation.innerText = "2x = 6";
-        document.getElementById("operationBox").classList.remove("hidden");
-        document.getElementById("operationTitle").innerText = "🧠 Strategic Step";
-        document.getElementById("operationEquation").innerHTML = "Divide BOTH sides by 2";
-        document.getElementById("operationExplanation").innerText = "Splitting into 2 equal groups isolates one x.";
-        document.getElementById("operationButton").classList.remove("hidden");
-        next.classList.add("hidden");
-        render();
-        return;
-    }
-    if (step === 10) {
-        instruction.innerHTML = "Dividing both sides gives us:";
-        equation.innerHTML = "<strong>2x ÷ 2 = 6 ÷ 2</strong>";
-        document.getElementById("operationBox").classList.remove("hidden");
-        document.getElementById("operationTitle").innerText = "Simplify";
-        document.getElementById("operationEquation").innerHTML = "<strong>x = 3</strong>";
-        document.getElementById("operationExplanation").innerText = "2s cancel on the left; 6 ÷ 2 = 3.";
-        document.getElementById("operationButton").classList.remove("hidden");
-        render();
-        return;
-    }
-    if (step === 11) {
-        triggerConfetti();
-        instruction.innerHTML = "🎉 Tutorial Completed! Golden Rule: <strong>Whatever you do to one side, do to the other!</strong>";
-        equation.innerHTML = "<strong>x = 3</strong>";
-        document.getElementById("operationBox").classList.add("hidden");
-        document.getElementById("operationButton").classList.add("hidden");
-        document.getElementById("message").innerHTML = "<span class='success'>Each mystery box weighs 3!</span>";
-        next.classList.remove("hidden");
-        next.innerText = "Start Level 1 →";
-        render();
-        return;
-    }
+function checkSolve() {
+    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+    document.getElementById("message").innerHTML = "<span class='success'>🎉 Correct! 3x = 9 → x = 3</span>";
 }
 
-function nextStep() {
-    if (level === 0) {
-        if (step === 3 && (tutorialRemovedLeft + tutorialRemovedRight === 0)) {
-            document.getElementById("message").innerHTML = "<span class='warning'>Remove one blue weight from the left first!</span>";
-            return;
-        }
-        if (step === 5 && (tutorialRemovedLeft !== 1 || tutorialRemovedRight !== 1)) {
-            document.getElementById("message").innerHTML = "<span class='warning'>Remove one weight from the right side too!</span>";
-            return;
-        }
-        if (step === 7 && (tutorialRemovedLeft !== 2 || tutorialRemovedRight !== 2)) {
-            document.getElementById("message").innerHTML = "<span class='warning'>Remove one more weight from BOTH sides!</span>";
-            return;
-        }
-        step++;
-        if (step >= 12) {
-            level = 1;
-            loadLevel();
-            return;
-        }
-        tutorialStep();
-    }
-}
-
-function performOperation() {
-    if (level === 0 && step === 9) { step = 10; tutorialStep(); return; }
-    if (level === 0 && step === 10) { step = 11; tutorialStep(); return; }
-}
-
-/* =========================================================
-   CHECK PROGRESS & CELEBRATIONS
-========================================================= */
-function checkProgress() {
-    const message = document.getElementById("message");
-
-    if (level === 1) {
-        triggerConfetti();
-        message.innerHTML = "<span class='success'>🎉 Perfect! x = 3</span><br>2x = 6 → Divide by 2 → x = 3";
-        document.getElementById("checkButton").classList.add("hidden");
-        const next = document.getElementById("nextStep");
-        next.classList.remove("hidden");
-        next.innerText = "Start Level 2 →";
-        next.onclick = () => { level = 2; loadLevel(); };
-        return;
-    }
-
-    if (level === 2) {
-        triggerConfetti();
-        message.innerHTML = "<span class='success'>🎉 Outstanding! x = 3</span><br>3x = 9 → Divide by 3 → x = 3";
-        document.getElementById("checkButton").classList.add("hidden");
-        const next = document.getElementById("nextStep");
-        next.classList.remove("hidden");
-        next.innerText = "Start Level 3 →";
-        next.onclick = () => { level = 3; loadLevel(); };
-        return;
-    }
-
-    if (level === 3) {
-        triggerConfetti();
-        message.innerHTML = "<span class='success'>🎉 Brilliant! x = 4</span><br>Substitute y = 3 into x + y = 7 → x + 3 = 7 → x = 4";
-        document.getElementById("checkButton").classList.add("hidden");
-        const next = document.getElementById("nextStep");
-        next.classList.remove("hidden");
-        next.innerText = "Finish Quest →";
-        next.onclick = gameComplete;
-        return;
-    }
-}
-
-function gameComplete() {
-    triggerConfetti();
-    document.getElementById("levelTitle").innerText = "🏆 Quest Complete!";
-    document.getElementById("instruction").innerHTML = "You have mastered solving linear equations with balance scales!";
-    document.getElementById("equationDisplay").innerText = "Algebra Master";
-    document.getElementById("balanceRow").innerHTML = "";
-    document.getElementById("message").innerHTML = "<span class='success'>Congratulations! You finished all levels!</span>";
-    document.getElementById("nextStep").classList.add("hidden");
-    document.getElementById("checkButton").classList.add("hidden");
+function loadLevel() {
+    leftBlocks = [{type:'x'}, {type:'x'}, {type:'x'}, {type:'w', val:1}];
+    rightBlocks = Array.from({length: 10}, () => ({type:'w', val:1}));
+    binBlocks = [];
+    document.getElementById("message").innerText = "";
+    render();
 }
 
 window.onload = loadLevel;
