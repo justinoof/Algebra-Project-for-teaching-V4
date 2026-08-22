@@ -12,7 +12,9 @@
     --pink: #ec4899;
     --blue: #3b82f6;
     --green: #22c55e;
+    --red: #ef4444;
     --dark: #1e293b;
+    --muted: #64748b;
     --bg: #eef2ff;
 }
 
@@ -151,6 +153,7 @@ header p {
     cursor: grab;
     box-shadow: 0 5px 10px rgba(0,0,0,.18);
     transition: transform .2s, opacity .3s;
+    user-select: none;
 }
 
 .block:hover {
@@ -181,11 +184,12 @@ header p {
 
 .bin {
     margin: 20px auto;
-    width: 220px;
-    min-height: 80px;
+    width: 260px;
+    min-height: 90px;
     border: 3px dashed #94a3b8;
     border-radius: 18px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     background: #f8fafc;
@@ -194,7 +198,25 @@ header p {
 
 .bin.over {
     background: #fee2e2;
-    border-color: #ef4444;
+    border-color: var(--red);
+    transform: scale(1.03);
+}
+
+.bin-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.inventory {
+    min-height: 35px;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.inventory .block {
+    cursor: default;
 }
 
 .controls {
@@ -251,26 +273,16 @@ button.green {
     margin: 15px 0;
 }
 
-.flash {
-    animation: flash .7s infinite alternate;
-}
-
-@keyframes flash {
-    from {
-        transform: scale(1);
-    }
-
-    to {
-        transform: scale(1.06);
-    }
-}
-
 .success {
     color: #16a34a;
 }
 
 .warning {
     color: #dc2626;
+}
+
+.info {
+    color: #2563eb;
 }
 
 @media(max-width: 700px) {
@@ -294,7 +306,6 @@ button.green {
 </header>
 
 <div class="game">
-
 <div class="card">
 
     <h2 id="levelTitle">Tutorial</h2>
@@ -308,7 +319,9 @@ button.green {
     <div class="balance-row" id="balanceRow"></div>
 
     <div id="bin" class="bin hidden">
-        🗑️ Drag blocks here
+        <div class="bin-title">🗑️ Removed Blocks</div>
+        <div class="inventory" id="inventory"></div>
+        <small>Drag blocks here</small>
     </div>
 
     <div class="controls">
@@ -317,11 +330,15 @@ button.green {
             Next →
         </button>
 
-        <button id="checkButton" class="green hidden" onclick="checkProgress()">
+        <button id="checkButton"
+                class="green hidden"
+                onclick="checkProgress()">
             Check
         </button>
 
-        <button id="restartButton" class="secondary hidden" onclick="restartLevel()">
+        <button id="restartButton"
+                class="secondary hidden"
+                onclick="restartLevel()">
             Restart Level
         </button>
 
@@ -343,6 +360,13 @@ let step = 0;
 
 let scales = [];
 
+/*
+    IMPORTANT:
+    Removed blocks are stored here instead of
+    disappearing completely.
+*/
+let removedBlocks = [];
+
 let tutorialRemovedLeft = 0;
 let tutorialRemovedRight = 0;
 
@@ -355,171 +379,188 @@ let dragData = null;
 
 
 /* =========================================================
-   LEVEL DEFINITIONS
+   HELPERS
+========================================================= */
+
+function makeWeights(amount) {
+    return Array.from({ length: amount }, () => ({
+        type: "weight",
+        value: 1
+    }));
+}
+
+function cloneBlocks(blocks) {
+    return blocks.map(block => ({ ...block }));
+}
+
+function clearRemovedBlocks() {
+    removedBlocks = [];
+}
+
+function getScale(id) {
+    return scales.find(scale => scale.id === id);
+}
+
+
+/* =========================================================
+   LEVEL SETUP
 ========================================================= */
 
 function setupTutorial() {
 
-    scales = [
-        {
-            id: "main",
-            left: [
-                {type:"x"},
-                {type:"x"},
-                {type:"weight", value:1},
-                {type:"weight", value:1}
-            ],
-            right: [
-                {type:"weight", value:1},
-                {type:"weight", value:1},
-                {type:"weight", value:1},
-                {type:"weight", value:1},
-                {type:"weight", value:1},
-                {type:"weight", value:1},
-                {type:"weight", value:1},
-                {type:"weight", value:1}
-            ]
-        }
-    ];
+    clearRemovedBlocks();
 
     tutorialRemovedLeft = 0;
     tutorialRemovedRight = 0;
+
+    scales = [{
+        id: "main",
+
+        left: [
+            {type:"x"},
+            {type:"x"},
+            ...makeWeights(2)
+        ],
+
+        right: makeWeights(8)
+    }];
 }
 
 
 function setupLevel1() {
 
-    scales = [
-        {
-            id: "main",
-            left: [
-                {type:"x"},
-                {type:"x"}
-            ],
-            right: [
-                {type:"weight", value:1},
-                {type:"weight", value:1},
-                {type:"weight", value:1},
-                {type:"weight", value:1},
-                {type:"weight", value:1},
-                {type:"weight", value:1}
-            ]
-        }
-    ];
+    clearRemovedBlocks();
+
+    scales = [{
+        id: "main",
+
+        left: [
+            {type:"x"},
+            {type:"x"}
+        ],
+
+        right: makeWeights(6)
+    }];
 }
 
 
 function setupLevel2() {
 
-    scales = [
-        {
-            id: "main",
-            left: [
-                {type:"x"},
-                {type:"x"},
-                {type:"x"},
-                {type:"weight", value:1}
-            ],
-            right: Array(10).fill(0).map(() => ({
-                type:"weight",
-                value:1
-            }))
-        }
-    ];
+    clearRemovedBlocks();
 
     level2RemovedLeft = 0;
     level2RemovedRight = 0;
+
+    scales = [{
+        id: "main",
+
+        left: [
+            {type:"x"},
+            {type:"x"},
+            {type:"x"},
+            {type:"weight", value:1}
+        ],
+
+        right: makeWeights(10)
+    }];
 }
 
 
 function setupLevel3() {
+
+    clearRemovedBlocks();
+
+    level3Stage = 0;
 
     scales = [
 
         {
             id: "xy",
             title: "Scale A",
+
             left: [
                 {type:"x"},
                 {type:"y"}
             ],
-            right: Array(7).fill(0).map(() => ({
-                type:"weight",
-                value:1
-            }))
+
+            right: makeWeights(7)
         },
 
         {
             id: "y",
             title: "Scale B",
+
             left: [
                 {type:"y"}
             ],
-            right: [
-                {type:"weight", value:1},
-                {type:"weight", value:1},
-                {type:"weight", value:1}
-            ]
+
+            right: makeWeights(3)
         }
 
     ];
-
-    level3Stage = 0;
 }
 
 
 /* =========================================================
-   RENDERING
+   RENDER
 ========================================================= */
 
 function render() {
 
-    const balanceRow = document.getElementById("balanceRow");
+    const balanceRow =
+        document.getElementById("balanceRow");
 
     balanceRow.innerHTML = "";
 
     scales.forEach(scale => {
 
-        const card = document.createElement("div");
+        const card =
+            document.createElement("div");
 
         card.className = "scale-card";
-
         card.id = "card-" + scale.id;
 
         if (scale.title) {
 
-            const heading = document.createElement("h3");
+            const heading =
+                document.createElement("h3");
 
             heading.innerText = scale.title;
 
             card.appendChild(heading);
         }
 
-        const scaleElement = document.createElement("div");
+        const scaleElement =
+            document.createElement("div");
 
         scaleElement.className = "scale";
 
-        const leftPan = document.createElement("div");
+        const leftPan =
+            document.createElement("div");
 
         leftPan.className = "pan left";
 
         leftPan.dataset.scale = scale.id;
-
         leftPan.dataset.side = "left";
 
-        const rightPan = document.createElement("div");
+        const rightPan =
+            document.createElement("div");
 
         rightPan.className = "pan right";
 
         rightPan.dataset.scale = scale.id;
-
         rightPan.dataset.side = "right";
 
 
         scale.left.forEach((block, index) => {
 
             leftPan.appendChild(
-                createBlock(block, scale.id, "left", index)
+                createBlock(
+                    block,
+                    scale.id,
+                    "left",
+                    index
+                )
             );
 
         });
@@ -528,28 +569,32 @@ function render() {
         scale.right.forEach((block, index) => {
 
             rightPan.appendChild(
-                createBlock(block, scale.id, "right", index)
+                createBlock(
+                    block,
+                    scale.id,
+                    "right",
+                    index
+                )
             );
 
         });
 
 
-        const beam = document.createElement("div");
+        const beam =
+            document.createElement("div");
 
         beam.className = "beam";
 
 
-        const pivot = document.createElement("div");
+        const pivot =
+            document.createElement("div");
 
         pivot.className = "pivot";
 
 
         scaleElement.appendChild(leftPan);
-
         scaleElement.appendChild(rightPan);
-
         scaleElement.appendChild(beam);
-
         scaleElement.appendChild(pivot);
 
         card.appendChild(scaleElement);
@@ -557,9 +602,52 @@ function render() {
         balanceRow.appendChild(card);
 
         updateTilt(scale);
-
     });
 
+    renderInventory();
+}
+
+
+/* =========================================================
+   INVENTORY
+========================================================= */
+
+function renderInventory() {
+
+    const inventory =
+        document.getElementById("inventory");
+
+    inventory.innerHTML = "";
+
+    removedBlocks.forEach(item => {
+
+        const block =
+            document.createElement("div");
+
+        block.className = "block";
+
+        if (item.block.type === "x") {
+            block.classList.add("x-block");
+            block.innerText = "x";
+        }
+
+        else if (item.block.type === "y") {
+            block.classList.add("y-block");
+            block.innerText = "y";
+        }
+
+        else {
+            block.classList.add(
+                "weight-block",
+                "small"
+            );
+
+            block.innerText =
+                item.block.value;
+        }
+
+        inventory.appendChild(block);
+    });
 }
 
 
@@ -569,65 +657,61 @@ function render() {
 
 function createBlock(block, scaleID, side, index) {
 
-    const element = document.createElement("div");
+    const element =
+        document.createElement("div");
 
-    element.className = "block ";
+    element.className = "block";
 
     if (block.type === "x") {
 
         element.classList.add("x-block");
-
         element.innerText = "x";
-
     }
 
-    if (block.type === "y") {
+    else if (block.type === "y") {
 
         element.classList.add("y-block");
-
         element.innerText = "y";
-
     }
 
-    if (block.type === "weight") {
+    else {
 
-        element.classList.add("weight-block");
+        element.classList.add(
+            "weight-block",
+            "small"
+        );
 
-        element.classList.add("small");
-
-        element.innerText = block.value;
-
+        element.innerText =
+            block.value;
     }
 
-
-    /*
-    Dragging is only enabled during
-    interactive removal stages.
-    */
 
     if (canDrag(scaleID, side, block)) {
 
         element.draggable = true;
 
-        element.addEventListener("dragstart", () => {
+        element.addEventListener(
+            "dragstart",
+            () => {
 
-            dragData = {
-                scaleID,
-                side,
-                index,
-                block
-            };
+                dragData = {
+                    scaleID,
+                    side,
+                    index,
+                    block
+                };
 
-            element.classList.add("dragging");
+                element.classList.add("dragging");
+            }
+        );
 
-        });
+        element.addEventListener(
+            "dragend",
+            () => {
 
-        element.addEventListener("dragend", () => {
-
-            element.classList.remove("dragging");
-
-        });
-
+                element.classList.remove("dragging");
+            }
+        );
     }
 
     return element;
@@ -635,42 +719,52 @@ function createBlock(block, scaleID, side, index) {
 
 
 /* =========================================================
-   CAN THE PLAYER DRAG THIS BLOCK?
+   DRAG RULES
 ========================================================= */
 
 function canDrag(scaleID, side, block) {
 
-    /* Tutorial */
+    /*
+        Tutorial:
+        Step 4 = remove first weight
+        Step 6 = remove matching weight
+        Step 7 = remove remaining weights
+    */
 
-    if (level === 0 && step === 4) {
+    if (level === 0) {
 
-        return block.type === "weight";
-
+        if (
+            step === 4 ||
+            step === 6 ||
+            step === 7
+        ) {
+            return block.type === "weight";
+        }
     }
 
 
-    if (level === 0 && step === 6) {
-
-        return block.type === "weight";
-
-    }
-
-
-    /* Level 2 */
+    /*
+        Level 2:
+        only normal weights can be removed.
+    */
 
     if (level === 2) {
 
         return block.type === "weight";
-
     }
 
 
-    /* Level 3 */
+    /*
+        Level 3:
+        after substitution, remove weights.
+    */
 
-    if (level === 3 && level3Stage === 2) {
+    if (
+        level === 3 &&
+        level3Stage === 2
+    ) {
 
         return block.type === "weight";
-
     }
 
     return false;
@@ -678,14 +772,10 @@ function canDrag(scaleID, side, block) {
 
 
 /* =========================================================
-   SCALE TILT
+   TILT
 ========================================================= */
 
 function updateTilt(scale) {
-
-    const leftWeight = calculateKnownWeight(scale.left);
-
-    const rightWeight = calculateKnownWeight(scale.right);
 
     const beam =
         document.querySelector(
@@ -695,42 +785,85 @@ function updateTilt(scale) {
     if (!beam) return;
 
 
-    /*
-    Mystery blocks have unknown weight,
-    so normally the game assumes
-    the equation is balanced.
-    */
+    const leftWeight =
+        calculateKnownWeight(scale.left);
+
+    const rightWeight =
+        calculateKnownWeight(scale.right);
+
 
     if (hasMystery(scale)) {
 
-        if (
-            (level === 0 &&
-            tutorialRemovedLeft !== tutorialRemovedRight)
-        ) {
+        /*
+            During removal stages, compare how many
+            blocks have been removed from each side.
+        */
 
-            beam.style.transform =
-                tutorialRemovedLeft > tutorialRemovedRight
-                ? "rotate(-7deg)"
-                : "rotate(7deg)";
+        if (level === 0) {
 
+            if (
+                tutorialRemovedLeft >
+                tutorialRemovedRight
+            ) {
+
+                beam.style.transform =
+                    "rotate(-7deg)";
+
+            }
+
+            else if (
+                tutorialRemovedRight >
+                tutorialRemovedLeft
+            ) {
+
+                beam.style.transform =
+                    "rotate(7deg)";
+
+            }
+
+            else {
+
+                beam.style.transform =
+                    "rotate(0deg)";
+            }
+
+            return;
         }
 
-        else if (
-            level === 2 &&
-            level2RemovedLeft !== level2RemovedRight
-        ) {
 
-            beam.style.transform =
-                level2RemovedLeft > level2RemovedRight
-                ? "rotate(-7deg)"
-                : "rotate(7deg)";
+        if (level === 2) {
 
+            if (
+                level2RemovedLeft >
+                level2RemovedRight
+            ) {
+
+                beam.style.transform =
+                    "rotate(-7deg)";
+
+            }
+
+            else if (
+                level2RemovedRight >
+                level2RemovedLeft
+            ) {
+
+                beam.style.transform =
+                    "rotate(7deg)";
+
+            }
+
+            else {
+
+                beam.style.transform =
+                    "rotate(0deg)";
+            }
+
+            return;
         }
 
-        else {
-
-            beam.style.transform = "rotate(0deg)";
-        }
+        beam.style.transform =
+            "rotate(0deg)";
 
         return;
     }
@@ -738,95 +871,135 @@ function updateTilt(scale) {
 
     if (leftWeight > rightWeight) {
 
-        beam.style.transform = "rotate(-8deg)";
+        beam.style.transform =
+            "rotate(-8deg)";
 
     }
 
     else if (rightWeight > leftWeight) {
 
-        beam.style.transform = "rotate(8deg)";
+        beam.style.transform =
+            "rotate(8deg)";
 
     }
 
     else {
 
-        beam.style.transform = "rotate(0deg)";
+        beam.style.transform =
+            "rotate(0deg)";
     }
 }
 
 
 function calculateKnownWeight(blocks) {
 
-    return blocks.reduce((total, block) => {
+    return blocks.reduce(
+        (total, block) => {
 
-        if (block.type === "weight") {
+            if (block.type === "weight") {
+                return total + block.value;
+            }
 
-            return total + block.value;
+            return total;
 
-        }
-
-        return total;
-
-    }, 0);
+        },
+        0
+    );
 }
 
 
 function hasMystery(scale) {
 
-    return [...scale.left, ...scale.right]
-        .some(
-            block =>
-                block.type === "x" ||
-                block.type === "y"
-        );
+    return [
+        ...scale.left,
+        ...scale.right
+    ].some(
+        block =>
+            block.type === "x" ||
+            block.type === "y"
+    );
 }
 
 
 /* =========================================================
-   DRAG AND DROP
+   BIN
 ========================================================= */
 
-const bin = document.getElementById("bin");
+const bin =
+    document.getElementById("bin");
 
-bin.addEventListener("dragover", event => {
+bin.addEventListener(
+    "dragover",
+    event => {
 
-    event.preventDefault();
+        event.preventDefault();
 
-    bin.classList.add("over");
+        bin.classList.add("over");
+    }
+);
 
-});
+bin.addEventListener(
+    "dragleave",
+    () => {
+
+        bin.classList.remove("over");
+    }
+);
+
+bin.addEventListener(
+    "drop",
+    event => {
+
+        event.preventDefault();
+
+        bin.classList.remove("over");
+
+        if (!dragData) return;
+
+        removeDraggedBlock();
+    }
+);
 
 
-bin.addEventListener("dragleave", () => {
-
-    bin.classList.remove("over");
-
-});
-
-
-bin.addEventListener("drop", event => {
-
-    event.preventDefault();
-
-    bin.classList.remove("over");
-
-    if (!dragData) return;
-
-    removeDraggedBlock();
-
-});
-
+/* =========================================================
+   REMOVE BLOCK
+========================================================= */
 
 function removeDraggedBlock() {
 
+    if (!dragData) return;
+
     const scale =
-        scales.find(
-            scale =>
-                scale.id === dragData.scaleID
-        );
+        getScale(dragData.scaleID);
 
-    if (!scale) return;
+    if (!scale) {
 
+        dragData = null;
+        return;
+    }
+
+
+    /*
+        SAVE THE BLOCK FIRST.
+
+        This is the important fix.
+        The block now exists in removedBlocks
+        instead of simply vanishing.
+    */
+
+    removedBlocks.push({
+        level,
+        scaleID: dragData.scaleID,
+        side: dragData.side,
+        block: {
+            ...dragData.block
+        }
+    });
+
+
+    /*
+        Remove it from the visible scale.
+    */
 
     scale[dragData.side].splice(
         dragData.index,
@@ -834,29 +1007,32 @@ function removeDraggedBlock() {
     );
 
 
-    /*
-    TUTORIAL
-    */
+    /* =====================================================
+       TUTORIAL
+    ===================================================== */
 
     if (level === 0) {
 
         if (dragData.side === "left") {
-
             tutorialRemovedLeft++;
-
         }
 
         else {
-
             tutorialRemovedRight++;
-
         }
 
 
-        if (tutorialRemovedLeft !== tutorialRemovedRight) {
+        if (
+            tutorialRemovedLeft !==
+            tutorialRemovedRight
+        ) {
 
-            document.getElementById("message").innerHTML =
-                "<span class='warning'>⚠️ The balance tilted!</span><br>" +
+            document.getElementById(
+                "message"
+            ).innerHTML =
+                "<span class='warning'>" +
+                "⚠️ The balance tilted!" +
+                "</span><br>" +
                 "You removed 1 from one side. " +
                 "Remove 1 from the other side too!";
 
@@ -864,38 +1040,43 @@ function removeDraggedBlock() {
 
         else {
 
-            document.getElementById("message").innerHTML =
-                "<span class='success'>⚖️ Balanced again!</span> " +
+            document.getElementById(
+                "message"
+            ).innerHTML =
+                "<span class='success'>" +
+                "⚖️ Balanced again!" +
+                "</span><br>" +
                 "You did the same thing to both sides.";
-
         }
-
     }
 
 
-    /*
-    LEVEL 2
-    */
+    /* =====================================================
+       LEVEL 2
+    ===================================================== */
 
     if (level === 2) {
 
         if (dragData.side === "left") {
-
             level2RemovedLeft++;
-
         }
 
         else {
-
             level2RemovedRight++;
-
         }
 
 
-        if (level2RemovedLeft !== level2RemovedRight) {
+        if (
+            level2RemovedLeft !==
+            level2RemovedRight
+        ) {
 
-            document.getElementById("message").innerHTML =
-                "<span class='warning'>⚠️ Not balanced!</span><br>" +
+            document.getElementById(
+                "message"
+            ).innerHTML =
+                "<span class='warning'>" +
+                "⚠️ Not balanced!" +
+                "</span><br>" +
                 "Whatever you remove from one side, " +
                 "you must remove from the other.";
 
@@ -903,32 +1084,38 @@ function removeDraggedBlock() {
 
         else {
 
-            document.getElementById("message").innerHTML =
-                "<span class='success'>Perfect!</span> " +
+            document.getElementById(
+                "message"
+            ).innerHTML =
+                "<span class='success'>" +
+                "Perfect!" +
+                "</span> " +
                 "The equation is still balanced.";
-
         }
-
     }
 
 
-    /*
-    LEVEL 3
-    */
+    /* =====================================================
+       LEVEL 3
+    ===================================================== */
 
-    if (level === 3 && level3Stage === 2) {
+    if (
+        level === 3 &&
+        level3Stage === 2
+    ) {
 
-        document.getElementById("message").innerHTML =
-            "You are solving <strong>x + 3 = 7</strong>. " +
+        document.getElementById(
+            "message"
+        ).innerHTML =
+            "You are solving " +
+            "<strong>x + 3 = 7</strong>.<br>" +
             "Remember: remove 3 from BOTH sides.";
-
     }
 
 
     dragData = null;
 
     render();
-
 }
 
 
@@ -940,27 +1127,35 @@ function loadLevel() {
 
     step = 0;
 
-    document.getElementById("message").innerText = "";
+    dragData = null;
 
-    document
-        .getElementById("substitutionBox")
-        .classList
-        .add("hidden");
+    document.getElementById(
+        "message"
+    ).innerText = "";
 
-    document
-        .getElementById("bin")
-        .classList
-        .add("hidden");
+    document.getElementById(
+        "substitutionBox"
+    ).classList.add("hidden");
 
-    document
-        .getElementById("checkButton")
-        .classList
-        .add("hidden");
+    document.getElementById(
+        "bin"
+    ).classList.add("hidden");
 
-    document
-        .getElementById("restartButton")
-        .classList
-        .add("hidden");
+    document.getElementById(
+        "checkButton"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "restartButton"
+    ).classList.add("hidden");
+
+
+    const next =
+        document.getElementById("nextStep");
+
+    next.classList.remove("hidden");
+    next.innerText = "Next →";
+    next.onclick = nextStep;
 
 
     if (level === 0) {
@@ -968,95 +1163,111 @@ function loadLevel() {
         setupTutorial();
 
         tutorialStep();
-
     }
 
     else if (level === 1) {
 
         setupLevel1();
 
-        document.getElementById("levelTitle").innerText =
+        document.getElementById(
+            "levelTitle"
+        ).innerText =
             "Level 1 — Mystery Blocks";
 
-        document.getElementById("instruction").innerHTML =
+        document.getElementById(
+            "instruction"
+        ).innerHTML =
             "Two identical mystery blocks balance with 6 weights. " +
             "How much does <strong>one mystery block</strong> weigh?";
 
-        document.getElementById("equationDisplay").innerText =
+        document.getElementById(
+            "equationDisplay"
+        ).innerText =
             "2x = 6";
 
-        document.getElementById("checkButton")
-            .classList.remove("hidden");
+        document.getElementById(
+            "checkButton"
+        ).classList.remove("hidden");
 
-        document.getElementById("nextStep").classList.add("hidden");
+        next.classList.add("hidden");
 
-        document.getElementById("restartButton")
-            .classList.remove("hidden");
+        document.getElementById(
+            "restartButton"
+        ).classList.remove("hidden");
 
         render();
-
     }
 
     else if (level === 2) {
 
         setupLevel2();
 
-        document.getElementById("levelTitle").innerText =
+        document.getElementById(
+            "levelTitle"
+        ).innerText =
             "Level 2 — Keep It Balanced";
 
-        document.getElementById("instruction").innerHTML =
-            "You need to remove the <strong>+1</strong> so that only the mystery blocks remain.<br>" +
-            "Drag a weight to the bin — but remember what happens to one side must happen to the other!";
+        document.getElementById(
+            "instruction"
+        ).innerHTML =
+            "You need to remove the <strong>+1</strong> " +
+            "so that only the mystery blocks remain.<br>" +
+            "Drag a weight to the bin — but remember: " +
+            "whatever happens to one side must happen to the other!";
 
-        document.getElementById("equationDisplay").innerText =
+        document.getElementById(
+            "equationDisplay"
+        ).innerText =
             "3x + 1 = 10";
 
-        document.getElementById("bin")
-            .classList.remove("hidden");
+        document.getElementById(
+            "bin"
+        ).classList.remove("hidden");
 
-        document.getElementById("checkButton")
-            .classList.remove("hidden");
+        document.getElementById(
+            "checkButton"
+        ).classList.remove("hidden");
 
-        document.getElementById("nextStep")
-            .classList.add("hidden");
+        next.classList.add("hidden");
 
-        document.getElementById("restartButton")
-            .classList.remove("hidden");
+        document.getElementById(
+            "restartButton"
+        ).classList.remove("hidden");
 
         render();
-
     }
 
     else if (level === 3) {
 
         setupLevel3();
 
-        document.getElementById("levelTitle").innerText =
+        document.getElementById(
+            "levelTitle"
+        ).innerText =
             "Level 3 — Two Mystery Boxes";
 
-        document.getElementById("instruction").innerHTML =
+        document.getElementById(
+            "instruction"
+        ).innerHTML =
             "Now there are <strong>two different mystery blocks!</strong><br>" +
             "Purple is <strong>x</strong> and pink is <strong>y</strong>.";
 
-        document.getElementById("equationDisplay").innerText =
+        document.getElementById(
+            "equationDisplay"
+        ).innerText =
             "x + y = 7      and      y = 3";
 
-        document.getElementById("nextStep")
-            .classList.remove("hidden");
-
-        document.getElementById("restartButton")
-            .classList.remove("hidden");
+        document.getElementById(
+            "restartButton"
+        ).classList.remove("hidden");
 
         render();
-
     }
 
     else {
 
         gameComplete();
-
     }
-
 }
 
 
@@ -1078,9 +1289,6 @@ function tutorialStep() {
     const next =
         document.getElementById("nextStep");
 
-    const check =
-        document.getElementById("checkButton");
-
 
     title.innerText =
         "Tutorial — Learn the Balance";
@@ -1090,12 +1298,14 @@ function tutorialStep() {
 
         instruction.innerHTML =
             "Welcome to <strong>Balance Quest!</strong> ⚖️<br>" +
-            "Your goal is to discover the weight of <strong>one mystery box</strong>.";
+            "Your goal is to discover the weight of " +
+            "<strong>one mystery box</strong>.";
 
         equation.innerText = "";
 
-        render();
+        next.classList.remove("hidden");
 
+        render();
     }
 
 
@@ -1110,7 +1320,6 @@ function tutorialStep() {
             "2x + 2 = 8";
 
         render();
-
     }
 
 
@@ -1118,64 +1327,69 @@ function tutorialStep() {
 
         instruction.innerHTML =
             "The scale is currently <strong>balanced</strong>. ⚖️<br>" +
-            "That means the total weight on the left equals the total weight on the right.";
+            "That means the total weight on the left equals " +
+            "the total weight on the right.";
 
         render();
-
     }
 
 
     else if (step === 3) {
 
         instruction.innerHTML =
-            "To solve the puzzle, we first need to get rid of the <strong>2 extra weights</strong> beside the mystery boxes.";
+            "To solve the puzzle, we first need to get rid " +
+            "of the <strong>2 extra weights</strong> beside " +
+            "the mystery boxes.";
 
         render();
-
     }
 
 
     else if (step === 4) {
 
         instruction.innerHTML =
-            "Try dragging <strong>one blue weight</strong> into the bin below! 🗑️";
+            "Try dragging <strong>one blue weight</strong> " +
+            "into the bin below! 🗑️";
 
-        document.getElementById("bin")
-            .classList.remove("hidden");
+        document.getElementById(
+            "bin"
+        ).classList.remove("hidden");
 
         next.classList.add("hidden");
 
         render();
-
     }
 
 
     else if (step === 5) {
 
         instruction.innerHTML =
-            "Notice what happened when you removed a weight from only one side...<br>" +
+            "Notice what happened when you removed a weight " +
+            "from only one side...<br>" +
             "<strong>The scale tilted!</strong> 😱";
 
         next.classList.remove("hidden");
 
         render();
-
     }
 
 
     else if (step === 6) {
 
         instruction.innerHTML =
-            "To fix it, remove <strong>one weight from the other side too</strong>.<br>" +
-            "This is the most important rule in algebra: <strong>whatever you do to one side, you must do to the other!</strong>";
+            "To fix it, remove <strong>one weight from the " +
+            "other side too</strong>.<br>" +
+            "This is the most important rule in algebra: " +
+            "<strong>whatever you do to one side, you must " +
+            "do to the other!</strong>";
 
-        document.getElementById("bin")
-            .classList.remove("hidden");
+        document.getElementById(
+            "bin"
+        ).classList.remove("hidden");
 
         next.classList.add("hidden");
 
         render();
-
     }
 
 
@@ -1183,18 +1397,21 @@ function tutorialStep() {
 
         instruction.innerHTML =
             "🎉 Great! The scale is balanced again.<br>" +
-            "Now remove the remaining extra weight from <strong>both sides</strong>.";
+            "Now remove the remaining extra weight from " +
+            "<strong>both sides</strong>.";
+
+        document.getElementById(
+            "message"
+        ).innerHTML =
+            "Drag one weight from each side to the bin.";
+
+        document.getElementById(
+            "bin"
+        ).classList.remove("hidden");
 
         next.classList.add("hidden");
 
         render();
-
-        document.getElementById("message").innerHTML =
-            "Drag one weight from each side to the bin.";
-
-        document.getElementById("bin")
-            .classList.remove("hidden");
-
     }
 
 
@@ -1206,39 +1423,42 @@ function tutorialStep() {
         equation.innerText =
             "2x = 6";
 
-        document.getElementById("bin")
-            .classList.add("hidden");
+        document.getElementById(
+            "bin"
+        ).classList.add("hidden");
 
         next.classList.remove("hidden");
 
         render();
-
     }
 
 
     else if (step === 9) {
 
         instruction.innerHTML =
-            "If 2 identical boxes weigh 6, split the 6 weights equally between them!";
+            "If 2 identical boxes weigh 6, split the 6 weights " +
+            "equally between them!";
 
         equation.innerHTML =
             "<strong>2x = 6 → x = 3</strong>";
 
-        document.getElementById("message").innerHTML =
-            "<span class='success'>🎉 Each mystery box weighs 3!</span>";
+        document.getElementById(
+            "message"
+        ).innerHTML =
+            "<span class='success'>" +
+            "🎉 Each mystery box weighs 3!" +
+            "</span>";
 
         next.innerText =
             "Start Level 1 →";
 
         render();
-
     }
-
 }
 
 
 /* =========================================================
-   NEXT BUTTON
+   NEXT
 ========================================================= */
 
 function nextStep() {
@@ -1246,14 +1466,20 @@ function nextStep() {
     if (level === 0) {
 
         /*
-        Tutorial interactive stages
+            Step 4:
+            Player must remove one block.
         */
 
         if (step === 4) {
 
-            if (tutorialRemovedLeft + tutorialRemovedRight === 0) {
+            if (
+                tutorialRemovedLeft +
+                tutorialRemovedRight === 0
+            ) {
 
-                document.getElementById("message").innerText =
+                document.getElementById(
+                    "message"
+                ).innerText =
                     "Try dragging a blue weight into the bin first!";
 
                 return;
@@ -1267,14 +1493,23 @@ function nextStep() {
         }
 
 
+        /*
+            Step 6:
+            Player must balance the scale.
+        */
+
         if (step === 6) {
 
             if (
-                tutorialRemovedLeft !== tutorialRemovedRight
+                tutorialRemovedLeft !==
+                tutorialRemovedRight
             ) {
 
-                document.getElementById("message").innerText =
-                    "The scale is still uneven. Remove the same amount from the other side!";
+                document.getElementById(
+                    "message"
+                ).innerText =
+                    "The scale is still uneven. " +
+                    "Remove the same amount from the other side!";
 
                 return;
             }
@@ -1287,6 +1522,11 @@ function nextStep() {
         }
 
 
+        /*
+            Step 7:
+            Both sides must have two removed blocks.
+        */
+
         if (step === 7) {
 
             if (
@@ -1294,7 +1534,9 @@ function nextStep() {
                 tutorialRemovedRight !== 2
             ) {
 
-                document.getElementById("message").innerText =
+                document.getElementById(
+                    "message"
+                ).innerText =
                     "Remove both extra weights from each side first!";
 
                 return;
@@ -1311,12 +1553,9 @@ function nextStep() {
         step++;
 
 
-        if (step === 10) {
+        if (step >= 10) {
 
             level = 1;
-
-            document.getElementById("nextStep").innerText =
-                "Next →";
 
             loadLevel();
 
@@ -1330,37 +1569,37 @@ function nextStep() {
     }
 
 
-    /*
-    LEVEL 3
-    */
-
     if (level === 3) {
 
         level3Next();
 
     }
-
 }
 
 
 /* =========================================================
-   LEVEL 3 SUBSTITUTION
+   LEVEL 3
 ========================================================= */
 
 function level3Next() {
 
     const substitutionBox =
-        document.getElementById("substitutionBox");
+        document.getElementById(
+            "substitutionBox"
+        );
 
 
     if (level3Stage === 0) {
 
-        document.getElementById("instruction").innerHTML =
+        document.getElementById(
+            "instruction"
+        ).innerHTML =
             "Look at <strong>Scale B</strong>.<br>" +
             "It tells us that one <strong>y block weighs exactly 3</strong>.";
 
-        document.getElementById("card-y")
-            .classList.add("highlight");
+        document.getElementById(
+            "card-y"
+        ).classList.add("highlight");
 
         level3Stage = 1;
 
@@ -1370,115 +1609,139 @@ function level3Next() {
 
     if (level3Stage === 1) {
 
-        document.getElementById("card-y")
-            .classList.remove("highlight");
+        document.getElementById(
+            "card-y"
+        ).classList.remove("highlight");
 
-        document.getElementById("card-xy")
-            .classList.add("highlight");
+        document.getElementById(
+            "card-xy"
+        ).classList.add("highlight");
 
         substitutionBox.classList.remove("hidden");
 
         substitutionBox.innerHTML =
             "✨ We know <strong>y = 3</strong>.<br><br>" +
-            "So we can replace the <strong>y</strong> block in Scale A with <strong>3 normal weights</strong>!";
+            "So we can replace the <strong>y</strong> block " +
+            "in Scale A with <strong>3 normal weights</strong>!";
+
+        /*
+            Short animation, then perform substitution.
+        */
 
         setTimeout(() => {
 
             const scale =
-                scales.find(
-                    scale => scale.id === "xy"
-                );
+                getScale("xy");
+
+            if (!scale) return;
+
 
             scale.left = [
                 {type:"x"},
-                {type:"weight", value:1},
-                {type:"weight", value:1},
-                {type:"weight", value:1}
+                ...makeWeights(3)
             ];
 
-            document.getElementById("equationDisplay").innerHTML =
+
+            document.getElementById(
+                "equationDisplay"
+            ).innerHTML =
                 "<strong>x + 3 = 7</strong>";
 
-            document.getElementById("instruction").innerHTML =
+
+            document.getElementById(
+                "instruction"
+            ).innerHTML =
                 "The pink <strong>y</strong> block has been replaced!<br>" +
-                "This is called <strong>substitution</strong>: replacing something with another value that is equal to it.";
+                "This is called <strong>substitution</strong>: " +
+                "replacing something with another value that is equal to it.";
+
 
             substitutionBox.innerHTML =
-                "y = 3 &nbsp;&nbsp; → &nbsp;&nbsp; x + <strong>y</strong> = 7 &nbsp;&nbsp; → &nbsp;&nbsp; x + <strong>3</strong> = 7";
+                "y = 3 &nbsp;&nbsp; → &nbsp;&nbsp; " +
+                "x + <strong>y</strong> = 7 &nbsp;&nbsp; → &nbsp;&nbsp; " +
+                "x + <strong>3</strong> = 7";
 
-            document.getElementById("bin")
-                .classList.remove("hidden");
 
-            document.getElementById("checkButton")
-                .classList.remove("hidden");
+            document.getElementById(
+                "bin"
+            ).classList.remove("hidden");
 
-            document.getElementById("nextStep")
-                .classList.add("hidden");
+
+            document.getElementById(
+                "checkButton"
+            ).classList.remove("hidden");
+
+
+            document.getElementById(
+                "nextStep"
+            ).classList.add("hidden");
+
 
             level3Stage = 2;
 
             render();
 
-        }, 1200);
+        }, 1000);
 
         return;
     }
-
 }
 
 
 /* =========================================================
-   CHECK PROGRESS
+   CHECK
 ========================================================= */
 
 function checkProgress() {
 
     const message =
-        document.getElementById("message");
+        document.getElementById(
+            "message"
+        );
 
 
-    /*
-    LEVEL 1
-    */
+    /* =====================================================
+       LEVEL 1
+    ===================================================== */
 
     if (level === 1) {
 
         message.innerHTML =
             "<span class='success'>🎉 Correct!</span><br>" +
-            "2 mystery boxes weigh 6, so each mystery box weighs <strong>3</strong>.<br>" +
+            "2 mystery boxes weigh 6, so each mystery " +
+            "box weighs <strong>3</strong>.<br>" +
             "<strong>x = 3</strong>";
 
-        document.getElementById("checkButton")
-            .classList.add("hidden");
 
-        document.getElementById("nextStep")
-            .classList.remove("hidden");
+        document.getElementById(
+            "checkButton"
+        ).classList.add("hidden");
 
-        document.getElementById("nextStep").innerText =
+
+        const next =
+            document.getElementById(
+                "nextStep"
+            );
+
+        next.classList.remove("hidden");
+
+        next.innerText =
             "Start Level 2 →";
 
-        document.getElementById("nextStep").onclick =
-            () => {
+        next.onclick = () => {
 
-                level = 2;
+            level = 2;
 
-                document.getElementById("nextStep").onclick =
-                    nextStep;
-
-                document.getElementById("nextStep").innerText =
-                    "Next →";
-
-                loadLevel();
-
-            };
+            loadLevel();
+        };
 
         return;
     }
 
 
-    /*
-    LEVEL 2
-    */
+    /* =====================================================
+       LEVEL 2
+    ===================================================== */
 
     if (level === 2) {
 
@@ -1493,66 +1756,79 @@ function checkProgress() {
                 "Split 9 equally between the 3 mystery boxes:<br>" +
                 "<strong>x = 3</strong>";
 
-            document.getElementById("checkButton")
-                .classList.add("hidden");
 
-            document.getElementById("nextStep")
-                .classList.remove("hidden");
+            document.getElementById(
+                "checkButton"
+            ).classList.add("hidden");
 
-            document.getElementById("nextStep").innerText =
+
+            const next =
+                document.getElementById(
+                    "nextStep"
+                );
+
+            next.classList.remove("hidden");
+
+            next.innerText =
                 "Start Level 3 →";
 
-            document.getElementById("nextStep").onclick =
-                () => {
+            next.onclick = () => {
 
-                    level = 3;
+                level = 3;
 
-                    document.getElementById("nextStep").onclick =
-                        nextStep;
-
-                    document.getElementById("nextStep").innerText =
-                        "Next →";
-
-                    loadLevel();
-
-                };
+                loadLevel();
+            };
 
         }
 
         else {
 
             message.innerHTML =
-                "<span class='warning'>Not quite!</span><br>" +
+                "<span class='warning'>" +
+                "Not quite!" +
+                "</span><br>" +
                 "You need to remove the 1 from both sides.";
-
         }
 
         return;
     }
 
 
-    /*
-    LEVEL 3
-    */
+    /* =====================================================
+       LEVEL 3
+    ===================================================== */
 
     if (level === 3) {
 
         const scale =
-            scales.find(
-                scale => scale.id === "xy"
-            );
+            getScale("xy");
+
+        if (!scale) return;
 
 
         const leftWeights =
             scale.left.filter(
-                block => block.type === "weight"
+                block =>
+                    block.type === "weight"
             ).length;
+
 
         const rightWeights =
             scale.right.filter(
-                block => block.type === "weight"
+                block =>
+                    block.type === "weight"
             ).length;
 
+
+        /*
+            x + 3 = 7
+
+            Remove all 3 weights from left
+            and 3 weights from right.
+
+            Result:
+            x = 4
+        */
 
         if (
             leftWeights === 0 &&
@@ -1560,42 +1836,49 @@ function checkProgress() {
         ) {
 
             message.innerHTML =
-                "<span class='success'>🏆 Amazing!</span><br>" +
+                "<span class='success'>" +
+                "🏆 Amazing!" +
+                "</span><br>" +
                 "After substitution:<br>" +
                 "<strong>x + 3 = 7</strong><br>" +
                 "You removed 3 from both sides:<br>" +
                 "<strong>x = 4</strong>";
 
-            document.getElementById("checkButton")
-                .classList.add("hidden");
 
-            document.getElementById("nextStep")
-                .classList.remove("hidden");
+            document.getElementById(
+                "checkButton"
+            ).classList.add("hidden");
 
-            document.getElementById("nextStep").innerText =
+
+            const next =
+                document.getElementById(
+                    "nextStep"
+                );
+
+            next.classList.remove("hidden");
+
+            next.innerText =
                 "Finish Game 🏆";
 
-            document.getElementById("nextStep").onclick =
-                () => {
+            next.onclick = () => {
 
-                    level = 4;
+                level = 4;
 
-                    loadLevel();
-
-                };
+                loadLevel();
+            };
 
         }
 
         else {
 
             message.innerHTML =
-                "<span class='warning'>Keep going!</span><br>" +
-                "You need to remove all 3 weights from the left AND 3 weights from the right.";
-
+                "<span class='warning'>" +
+                "Keep going!" +
+                "</span><br>" +
+                "Remove 3 weights from the left " +
+                "AND 3 weights from the right.";
         }
-
     }
-
 }
 
 
@@ -1605,52 +1888,85 @@ function checkProgress() {
 
 function restartLevel() {
 
-    loadLevel();
+    /*
+        Completely recreate the current level.
 
+        This means every removed block comes back.
+        No stale drag data.
+        No old inventory.
+        No broken counters.
+    */
+
+    dragData = null;
+
+    loadLevel();
 }
 
 
 /* =========================================================
-   GAME COMPLETE
+   COMPLETE
 ========================================================= */
 
 function gameComplete() {
 
-    document.getElementById("levelTitle").innerText =
+    document.getElementById(
+        "levelTitle"
+    ).innerText =
         "🏆 Balance Quest Complete!";
 
-    document.getElementById("instruction").innerHTML =
+
+    document.getElementById(
+        "instruction"
+    ).innerHTML =
         "You've learned the foundations of algebra through balancing!";
 
-    document.getElementById("equationDisplay").innerHTML =
-        "<strong>x = 3 &nbsp; • &nbsp; x = 3 &nbsp; • &nbsp; x = 4</strong>";
 
-    document.getElementById("balanceRow").innerHTML = "";
+    document.getElementById(
+        "equationDisplay"
+    ).innerHTML =
+        "<strong>" +
+        "x = 3 &nbsp; • &nbsp; x = 3 &nbsp; • &nbsp; x = 4" +
+        "</strong>";
 
-    document.getElementById("bin")
-        .classList.add("hidden");
 
-    document.getElementById("checkButton")
-        .classList.add("hidden");
+    document.getElementById(
+        "balanceRow"
+    ).innerHTML = "";
 
-    document.getElementById("restartButton")
-        .classList.add("hidden");
 
-    document.getElementById("nextStep")
-        .classList.add("hidden");
+    document.getElementById(
+        "bin"
+    ).classList.add("hidden");
 
-    document.getElementById("message").innerHTML =
+
+    document.getElementById(
+        "checkButton"
+    ).classList.add("hidden");
+
+
+    document.getElementById(
+        "restartButton"
+    ).classList.add("hidden");
+
+
+    document.getElementById(
+        "nextStep"
+    ).classList.add("hidden");
+
+
+    document.getElementById(
+        "message"
+    ).innerHTML =
         "<span class='success'>You learned:</span><br><br>" +
         "🟪 Variables represent unknown values<br>" +
         "⚖️ Both sides of an equation must stay equal<br>" +
         "➖ Whatever you do to one side, do to the other<br>" +
         "✨ Substitution lets you replace a variable with a known value";
-
 }
 
 
 /* =========================================================
-   START
+   START GAME
 ========================================================= */
 
 loadLevel();
