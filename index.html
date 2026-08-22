@@ -21,7 +21,6 @@
     --blue: #3b82f6;
     --green: #10b981;
     --red: #ef4444;
-    --orange: #f59e0b;
     --dark: #0f172a;
     --muted: #64748b;
     --bg-gradient: linear-gradient(135deg, #eef2ff 0%, #f1f5f9 100%);
@@ -48,32 +47,31 @@ h1, h2, h3, .equation-display, .operation-equation {
 header {
     background: linear-gradient(135deg, #7c3aed, #2563eb);
     color: white;
-    padding: 30px 20px;
+    padding: 25px 20px;
     box-shadow: 0 4px 20px rgba(124, 58, 237, 0.15);
 }
 
 header h1 {
     margin: 0;
     font-size: 2.2rem;
-    letter-spacing: -0.5px;
 }
 
 header p {
-    margin: 8px 0 0;
+    margin: 6px 0 0;
     opacity: 0.9;
-    font-size: 1.05rem;
+    font-size: 1rem;
 }
 
 .game {
     max-width: 1000px;
-    margin: 30px auto;
-    padding: 0 20px 40px;
+    margin: 20px auto;
+    padding: 0 15px 40px;
 }
 
 .card {
     background: var(--card-bg);
     border-radius: 24px;
-    padding: 35px;
+    padding: 30px;
     box-shadow: 0 20px 40px -15px rgba(0,0,0,0.07);
     border: 1px solid rgba(226, 232, 240, 0.8);
 }
@@ -81,7 +79,6 @@ header p {
 #levelTitle {
     margin-top: 0;
     font-size: 1.8rem;
-    color: var(--dark);
 }
 
 #instruction {
@@ -93,11 +90,10 @@ header p {
 
 .equation-display {
     font-size: 2.2rem;
-    margin: 20px 0;
+    margin: 15px 0;
     font-weight: 700;
     color: var(--purple-dark);
     min-height: 48px;
-    letter-spacing: 1px;
 }
 
 .operation-box {
@@ -126,33 +122,27 @@ header p {
     justify-content: center;
     gap: 25px;
     flex-wrap: wrap;
-    margin: 25px 0;
+    margin: 20px 0;
 }
 
 .scale-card {
     flex: 1;
-    min-width: 320px;
+    min-width: 300px;
     background: #f8fafc;
     border-radius: 20px;
     padding: 20px;
     border: 2px solid #e2e8f0;
-    transition: all 0.3s ease;
-}
-
-.scale-card.highlight {
-    border-color: var(--purple);
-    box-shadow: 0 0 25px rgba(139,92,246,0.2);
 }
 
 .scale {
     position: relative;
-    height: 250px;
+    height: 240px;
     margin-top: 10px;
 }
 
 .beam {
     position: absolute;
-    top: 165px;
+    top: 160px;
     left: 10%;
     width: 80%;
     height: 12px;
@@ -164,7 +154,7 @@ header p {
 
 .pivot {
     position: absolute;
-    top: 176px;
+    top: 171px;
     left: 50%;
     transform: translateX(-50%);
     width: 0;
@@ -176,15 +166,15 @@ header p {
 
 .pan {
     position: absolute;
-    top: 30px;
+    top: 25px;
     width: 42%;
     min-height: 110px;
-    padding: 10px;
+    padding: 8px;
     display: flex;
     align-items: flex-end;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
     border-bottom: 5px solid #94a3b8;
     border-radius: 0 0 12px 12px;
 }
@@ -193,26 +183,28 @@ header p {
 .pan.right { right: 4%; }
 
 .block {
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: center;
     color: white;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 700;
     font-family: 'Outfit', sans-serif;
-    cursor: grab;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
     user-select: none;
-    touch-action: none;
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.block:hover {
-    transform: translateY(-4px) scale(1.06);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.18);
+.block.interactive {
+    cursor: pointer;
+}
+
+.block.interactive:hover {
+    transform: translateY(-4px) scale(1.08);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.2);
 }
 
 .block.dragging { opacity: 0.3; }
@@ -221,19 +213,19 @@ header p {
 .weight-block { background: linear-gradient(135deg, #60a5fa, #2563eb); }
 
 .block.small {
-    width: 40px;
-    height: 40px;
-    font-size: 16px;
+    width: 38px;
+    height: 38px;
+    font-size: 15px;
     border-radius: 10px;
 }
 
 .bin {
-    margin: 25px auto;
+    margin: 20px auto;
     width: 280px;
-    min-height: 100px;
+    min-height: 95px;
     border: 2px dashed #cbd5e1;
     border-radius: 20px;
-    padding: 12px;
+    padding: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -253,19 +245,19 @@ header p {
     justify-content: center;
     flex-wrap: wrap;
     gap: 6px;
-    min-height: 42px;
-    margin-top: 8px;
+    min-height: 40px;
+    margin-top: 6px;
 }
 
 .controls {
-    margin-top: 25px;
+    margin-top: 20px;
 }
 
 button {
     border: none;
     border-radius: 14px;
-    padding: 14px 28px;
-    margin: 6px;
+    padding: 13px 26px;
+    margin: 5px;
     background: var(--purple);
     color: white;
     font-size: 1rem;
@@ -286,10 +278,6 @@ button.green {
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
 }
 
-button.green:hover {
-    box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);
-}
-
 button.secondary {
     background: var(--muted);
     box-shadow: none;
@@ -298,11 +286,10 @@ button.secondary {
 .hidden { display: none !important; }
 
 .message {
-    min-height: 48px;
-    margin-top: 20px;
+    min-height: 45px;
+    margin-top: 15px;
     font-size: 1.1rem;
     font-weight: 600;
-    line-height: 1.5;
 }
 
 .success { color: #059669; }
@@ -310,7 +297,7 @@ button.secondary {
 
 @media(max-width: 700px) {
     .scale-card { min-width: 100%; }
-    .block { width: 44px; height: 44px; }
+    .block { width: 42px; height: 42px; }
 }
 </style>
 </head>
@@ -338,9 +325,9 @@ button.secondary {
     <div id="balanceRow" class="balance-row"></div>
 
     <div id="bin" class="bin hidden">
-        <strong>🗑️ Drop Blocks Here</strong>
+        <strong>🗑️ Removed Blocks</strong>
         <div id="inventory" class="inventory"></div>
-        <small style="color: var(--muted); margin-top: 4px;">Drag weights here to remove</small>
+        <small style="color: var(--muted); margin-top: 4px;">Click or drag blocks here to remove</small>
     </div>
 
     <div class="controls">
@@ -356,9 +343,6 @@ button.secondary {
 </div>
 
 <script>
-/* =========================================================
-   GAME STATE
-========================================================= */
 let level = 0;
 let step = 0;
 let scales = [];
@@ -372,11 +356,7 @@ let level2RemovedRight = 0;
 let dragData = null;
 
 function triggerConfetti() {
-    confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 }
-    });
+    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
 }
 
 function weights(number) {
@@ -530,50 +510,23 @@ function createBlock(block, scaleID, side, index) {
     }
 
     if (canDrag(block)) {
+        element.classList.add("interactive");
         element.draggable = true;
 
-        // Desktop Mouse Drag
+        // Click / Tap to Remove
+        element.addEventListener("click", () => {
+            dragData = { scaleID, side, index, block };
+            removeBlock();
+        });
+
+        // Drag handlers
         element.addEventListener("dragstart", () => {
             dragData = { scaleID, side, index, block };
             element.classList.add("dragging");
         });
+
         element.addEventListener("dragend", () => {
             element.classList.remove("dragging");
-        });
-
-        // Mobile Touch Drag Support
-        element.addEventListener("touchstart", (e) => {
-            dragData = { scaleID, side, index, block };
-            element.classList.add("dragging");
-        }, { passive: true });
-
-        element.addEventListener("touchmove", (e) => {
-            const touch = e.touches[0];
-            element.style.position = "fixed";
-            element.style.left = touch.clientX - 25 + "px";
-            element.style.top = touch.clientY - 25 + "px";
-            element.style.zIndex = 1000;
-        }, { passive: true });
-
-        element.addEventListener("touchend", (e) => {
-            element.classList.remove("dragging");
-            element.style.position = "";
-            element.style.left = "";
-            element.style.top = "";
-            element.style.zIndex = "";
-
-            const touch = e.changedTouches[0];
-            const binElem = document.getElementById("bin");
-            const rect = binElem.getBoundingClientRect();
-
-            if (
-                touch.clientX >= rect.left &&
-                touch.clientX <= rect.right &&
-                touch.clientY >= rect.top &&
-                touch.clientY <= rect.bottom
-            ) {
-                removeBlock();
-            }
         });
     }
 
@@ -583,10 +536,8 @@ function createBlock(block, scaleID, side, index) {
 function canDrag(block) {
     if (block.type !== "weight") return false;
     if (level === 0) return (step === 3 || step === 5 || step === 7);
-    if (level === 1) return false;
     if (level === 2) return true;
-    if (level === 3) return true;
-    return true;
+    return false;
 }
 
 function renderInventory() {
@@ -622,7 +573,7 @@ function updateTilt(scale) {
 }
 
 /* =========================================================
-   DRAG AND DROP BIN HANDLERS
+   DRAG & DROP BIN
 ========================================================= */
 const bin = document.getElementById("bin");
 bin.addEventListener("dragover", event => {
@@ -633,8 +584,7 @@ bin.addEventListener("dragleave", () => bin.classList.remove("over"));
 bin.addEventListener("drop", event => {
     event.preventDefault();
     bin.classList.remove("over");
-    if (!dragData) return;
-    removeBlock();
+    if (dragData) removeBlock();
 });
 
 function removeBlock() {
@@ -654,7 +604,7 @@ function removeBlock() {
     if (level === 0) {
         if (dragData.side === "left") tutorialRemovedLeft++;
         else tutorialRemovedRight++;
-        document.getElementById("message").innerHTML = "<span class='success'>Block removed!</span> Keep balancing.";
+        document.getElementById("message").innerHTML = "<span class='success'>Block removed!</span>";
     }
 
     if (level === 2) {
@@ -695,7 +645,7 @@ function loadLevel() {
     if (level === 2) {
         setupLevel2();
         document.getElementById("levelTitle").innerText = "Level 2 — Solve 3x + 1 = 10";
-        document.getElementById("instruction").innerHTML = "First step: Drag <strong>+1</strong> off BOTH sides into the bin to balance!";
+        document.getElementById("instruction").innerHTML = "Click or drag the <strong>+1 weight block</strong> off BOTH sides to balance!";
         document.getElementById("equationDisplay").innerText = "3x + 1 = 10";
         document.getElementById("bin").classList.remove("hidden");
         document.getElementById("restartButton").classList.remove("hidden");
@@ -752,15 +702,14 @@ function tutorialStep() {
         return;
     }
     if (step === 2) {
-        instruction.innerHTML = "We want <strong>x</strong> by itself. Let's remove the extra weights.";
+        instruction.innerHTML = "We want <strong>x</strong> by itself. Let me show you how to remove weights.";
         equation.innerText = "2x + 2 = 8";
-        document.getElementById("bin").classList.remove("hidden");
-        next.classList.add("hidden");
+        next.classList.remove("hidden");
         render();
         return;
     }
     if (step === 3) {
-        instruction.innerHTML = "Drag <strong>one blue weight from the left side</strong> into the bin.";
+        instruction.innerHTML = "<strong>Click or drag one blue weight from the left side</strong> to remove it.";
         equation.innerText = "2x + 2 = 8";
         document.getElementById("bin").classList.remove("hidden");
         next.classList.add("hidden");
@@ -775,7 +724,7 @@ function tutorialStep() {
         return;
     }
     if (step === 5) {
-        instruction.innerHTML = "Now drag <strong>one weight from the right side</strong> into the bin to rebalance.";
+        instruction.innerHTML = "Now <strong>click or drag one weight from the right side</strong> to rebalance.";
         equation.innerText = "2x + 1 = 8 - 1";
         document.getElementById("bin").classList.remove("hidden");
         next.classList.add("hidden");
@@ -790,7 +739,7 @@ function tutorialStep() {
         return;
     }
     if (step === 7) {
-        instruction.innerHTML = "Drag the remaining extra weight from BOTH sides into the bin.";
+        instruction.innerHTML = "Click or drag the remaining extra weight from BOTH sides.";
         equation.innerText = "2x + 1 = 7";
         document.getElementById("bin").classList.remove("hidden");
         next.classList.add("hidden");
@@ -845,7 +794,7 @@ function tutorialStep() {
 function nextStep() {
     if (level === 0) {
         if (step === 3 && (tutorialRemovedLeft + tutorialRemovedRight === 0)) {
-            document.getElementById("message").innerHTML = "<span class='warning'>Drag one blue weight to the bin first!</span>";
+            document.getElementById("message").innerHTML = "<span class='warning'>Remove one blue weight from the left first!</span>";
             return;
         }
         if (step === 5 && (tutorialRemovedLeft !== 1 || tutorialRemovedRight !== 1)) {
